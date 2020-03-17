@@ -10,7 +10,7 @@ ext {
 	mockitoVersion = '3.2.4'
 	moduleName = 'net.jqwik.spring'
 	jqwikVersion = '1.2.5-SNAPSHOT'
-	jqwikSpringVersion = '0.1.0'
+	jqwikSpringVersion = '0.1.0-SNAPSHOT'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
