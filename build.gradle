@@ -1,0 +1,125 @@
+static isSnapshotRelease(versionString) {
+	versionString.endsWith('SNAPSHOT')
+}
+
+ext {
+	junitPlatformVersion = '1.6.0'
+	opentest4jVersion = '1.2.0'
+//	junitJupiterVersion = '5.6.0'
+	assertJVersion = '3.15.0'
+	mockitoVersion = '3.2.4'
+	moduleName = 'net.jqwik.spring'
+	jqwikVersion = '1.2.5-SNAPSHOT'
+	jqwikSpringVersion = '0.1.0'
+	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+group = moduleName
+version = jqwikSpringVersion
+
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+tasks['publish'].dependsOn(build)
+
+publishing {
+	repositories {
+		maven {
+			// hint: password is in ~/.gradle/gradle.properties
+			def ossrhUsername = project.hasProperty('ossrhUsername') ? project.ossrhUsername : ''
+			def ossrhPassword = project.hasProperty('ossrhPassword') ? project.ossrhPassword : ''
+
+			credentials {
+				username = ossrhUsername
+				password = ossrhPassword
+			}
+
+			// change URLs to point to your repos, e.g. http://my.org/repo
+			def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+			def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+			url = isSnapshotRelease ? snapshotsRepoUrl : releasesRepoUrl
+		}
+	}
+	publications {
+		jqwikSpring(MavenPublication) {
+			groupId = 'net.jqwik'
+			artifactId = 'jqwik-spring'
+			from components.java
+			pom {
+				groupId = 'net.jqwik'
+				name = 'jqwik-spring'
+				description = project.description
+				url = 'https://github.org/jlink/jqwik-spring'
+				licenses {
+					license {
+						name = 'Eclipse Public License - v 2.0'
+						url = 'http://www.eclipse.org/legal/epl-v20.html'
+					}
+				}
+				developers {
+					developer {
+						id = 'jlink'
+						name = 'Johannes Link'
+						email = 'business@johanneslink.net'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/jlink/jqwik-spring.git'
+					developerConnection = 'scm:git:git://github.com/jlink/jqwik-spring.git'
+					url = 'https://github.com/jlink/jqwik-spring'
+				}
+			}
+		}
+	}
+}
+
+signing {
+	if (!isSnapshotRelease) {
+		sign publishing.publications.jqwikSpring
+	}
+}
+
+java {
+	withJavadocJar()
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+compileTestJava {
+	options.compilerArgs += '-parameters'
+	options.encoding = 'UTF-8'
+}
+
+test {
+	useJUnitPlatform {
+		includeEngines 'jqwik'
+	}
+
+	include 'net/**/*Properties.class'
+	include 'net/**/*Example.class'
+	include 'net/**/*Examples.class'
+	include 'net/**/*Test.class'
+	include 'net/**/*Tests.class'
+
+	// testLogging.showStandardStreams = true
+}
+
+dependencies {
+	api("org.opentest4j:opentest4j:${opentest4jVersion}")
+	api("net.jqwik:jqwik:${jqwikVersion}")
+
+	testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+	testImplementation("org.assertj:assertj-core:${assertJVersion}")
+}
+
+wrapper {
+	description = 'Generates gradlew[.bat] scripts'
+	gradleVersion = '6.1.1'
+}
