@@ -35,6 +35,10 @@ apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
+// bootJar must not be run since this is not a boot application but a library
+tasks['bootJar'].enabled(false)
+// jar must be run instead
+tasks['jar'].enabled(true)
 tasks['publish'].dependsOn(build)
 
 publishing {
@@ -147,5 +151,5 @@ dependencies {
 
 wrapper {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '6.1.1'
+	gradleVersion = '6.2.2'
 }
