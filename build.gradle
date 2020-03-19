@@ -23,7 +23,7 @@ ext['junit-jupiter.version'] = "${junitJupiterVersion}"
 
 repositories {
 	mavenCentral()
-	maven { url 'http://repo.spring.io/plugins-release' }
+	maven { url 'https://repo.spring.io/plugins-release' }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
@@ -52,11 +52,11 @@ test {
 		includeEngines 'jqwik'
 	}
 
-	include 'net/**/*Properties.class'
-	include 'net/**/*Example.class'
-	include 'net/**/*Examples.class'
-	include 'net/**/*Test.class'
-	include 'net/**/*Tests.class'
+	include '**/*Properties.class'
+	include '**/*Example.class'
+	include '**/*Examples.class'
+	include '**/*Test.class'
+	include '**/*Tests.class'
 
 	// testLogging.showStandardStreams = true
 }
