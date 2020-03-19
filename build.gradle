@@ -35,6 +35,57 @@ apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
+java {
+	withJavadocJar()
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+compileTestJava {
+	options.compilerArgs += '-parameters'
+	options.encoding = 'UTF-8'
+}
+
+test {
+	useJUnitPlatform {
+		includeEngines 'jqwik'
+	}
+
+	include 'net/**/*Properties.class'
+	include 'net/**/*Example.class'
+	include 'net/**/*Examples.class'
+	include 'net/**/*Test.class'
+	include 'net/**/*Tests.class'
+
+	// testLogging.showStandardStreams = true
+}
+
+configurations {
+	provided
+}
+
+sourceSets {
+	main { compileClasspath += configurations.provided }
+}
+
+dependencies {
+	api("org.opentest4j:opentest4j:${opentest4jVersion}")
+	api("net.jqwik:jqwik:${jqwikVersion}")
+
+	provided("org.springframework:spring-test")
+
+	testImplementation("org.assertj:assertj-core:${assertJVersion}")
+
+	testImplementation("org.mockito:mockito-core")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// To work around IntelliJ bug to not provide run test decorator
+	// https://youtrack.jetbrains.com/issue/IDEA-231482
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-api")
+
+}
+
 // bootJar must not be run since this is not a boot application but a library
 tasks['bootJar'].enabled(false)
 // jar must be run instead
@@ -96,57 +147,6 @@ signing {
 	if (!isSnapshotRelease) {
 		sign publishing.publications.jqwikSpring
 	}
-}
-
-java {
-	withJavadocJar()
-	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-compileTestJava {
-	options.compilerArgs += '-parameters'
-	options.encoding = 'UTF-8'
-}
-
-test {
-	useJUnitPlatform {
-		includeEngines 'jqwik'
-	}
-
-	include 'net/**/*Properties.class'
-	include 'net/**/*Example.class'
-	include 'net/**/*Examples.class'
-	include 'net/**/*Test.class'
-	include 'net/**/*Tests.class'
-
-	// testLogging.showStandardStreams = true
-}
-
-configurations {
-	provided
-}
-
-sourceSets {
-	main { compileClasspath += configurations.provided }
-}
-
-dependencies {
-	api("org.opentest4j:opentest4j:${opentest4jVersion}")
-	api("net.jqwik:jqwik:${jqwikVersion}")
-
-	provided("org.springframework:spring-test")
-
-	testImplementation("org.assertj:assertj-core:${assertJVersion}")
-
-	testImplementation("org.mockito:mockito-core")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-	// To work around IntelliJ bug to not provide run test decorator
-	// https://youtrack.jetbrains.com/issue/IDEA-231482
-	testRuntimeOnly("org.junit.jupiter:junit-jupiter-api")
-
 }
 
 wrapper {
