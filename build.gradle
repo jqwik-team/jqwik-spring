@@ -74,15 +74,14 @@ dependencies {
 	api("net.jqwik:jqwik:${jqwikVersion}")
 
 	provided("org.springframework:spring-test")
+	provided("org.springframework:spring-context")
 
 	testImplementation("org.assertj:assertj-core:${assertJVersion}")
 
 	testImplementation("org.mockito:mockito-core")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-	// To work around IntelliJ bug to not provide run test decorator
-	// https://youtrack.jetbrains.com/issue/IDEA-231482
-	testRuntimeOnly("org.junit.jupiter:junit-jupiter-api")
+	testImplementation("org.junit.jupiter:junit-jupiter-api")
 
 }
 
