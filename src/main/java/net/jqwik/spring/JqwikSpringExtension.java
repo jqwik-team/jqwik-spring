@@ -9,13 +9,12 @@ import org.apiguardian.api.*;
 import org.springframework.context.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.support.*;
-import org.springframework.util.*;
 
 /**
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
  */
 @API(status = API.Status.EXPERIMENTAL, since = "0.1.0")
-public class JqwikSpringExtension implements BeforeContainerHook, AfterContainerHook {
+public class JqwikSpringExtension implements BeforeContainerHook, AfterContainerHook, AroundTryHook {
 
 	@Override
 	public PropagationMode propagateTo() {
@@ -38,7 +37,7 @@ public class JqwikSpringExtension implements BeforeContainerHook, AfterContainer
 	private Store<TestContextManager> testContextManagerStore(LifecycleContext context) {
 		Optional<Class<?>> optionalContainerClass = optionalContainerClass(context);
 		return optionalContainerClass.map(
-				containerClass -> Store.create(
+				containerClass -> Store.getOrCreate(
 						Tuple.of(this, containerClass),
 						Lifespan.RUN,
 						() -> new TestContextManager(containerClass)
@@ -75,55 +74,58 @@ public class JqwikSpringExtension implements BeforeContainerHook, AfterContainer
 		getTestContextManager().afterTestClass();
 	}
 
-	/**
-	 * Delegates to {@link TestContextManager#prepareTestInstance}.
-	 */
-//	@Override
-//	public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
-//		getTestContextManager(context).prepareTestInstance(testInstance);
-//	}
+	@Override
+	public int beforeContainerProximity() {
+		return -20;
+	}
 
-	/**
-	 * Delegates to {@link TestContextManager#beforeTestMethod}.
-	 */
-//	@Override
-//	public void beforeEach(ExtensionContext context) throws Exception {
-//		Object testInstance = context.getRequiredTestInstance();
-//		Method testMethod = context.getRequiredTestMethod();
-//		getTestContextManager(context).beforeTestMethod(testInstance, testMethod);
-//	}
+	@Override
+	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
+		Object testInstance = context.propertyContext().testInstance();
+		prepareTestInstance(testInstance);
+		Method testMethod = context.propertyContext().targetMethod();
+		beforeExecutionHooks(testInstance, testMethod);
 
-	/**
-	 * Delegates to {@link TestContextManager#beforeTestExecution}.
-	 */
-//	@Override
-//	public void beforeTestExecution(ExtensionContext context) throws Exception {
-//		Object testInstance = context.getRequiredTestInstance();
-//		Method testMethod = context.getRequiredTestMethod();
-//		getTestContextManager(context).beforeTestExecution(testInstance, testMethod);
-//	}
+		// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
+		beforeExecution(testInstance, testMethod);
 
-	/**
-	 * Delegates to {@link TestContextManager#afterTestExecution}.
-	 */
-//	@Override
-//	public void afterTestExecution(ExtensionContext context) throws Exception {
-//		Object testInstance = context.getRequiredTestInstance();
-//		Method testMethod = context.getRequiredTestMethod();
-//		Throwable testException = context.getExecutionException().orElse(null);
-//		getTestContextManager(context).afterTestExecution(testInstance, testMethod, testException);
-//	}
+		Throwable testException = null;
+		try {
+			TryExecutionResult executionResult = aTry.execute(parameters);
+			testException = executionResult.throwable().orElse(null);
+			return executionResult;
+		} finally {
+			// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
+			afterExecution(testInstance, testMethod, testException);
 
-	/**
-	 * Delegates to {@link TestContextManager#afterTestMethod}.
-	 */
-//	@Override
-//	public void afterEach(ExtensionContext context) throws Exception {
-//		Object testInstance = context.getRequiredTestInstance();
-//		Method testMethod = context.getRequiredTestMethod();
-//		Throwable testException = context.getExecutionException().orElse(null);
-//		getTestContextManager(context).afterTestMethod(testInstance, testMethod, testException);
-//	}
+			afterExecutionHooks(testInstance, testMethod, testException);
+		}
+	}
+
+	@Override
+	public int aroundTryProximity() {
+		return -20;
+	}
+
+	private void prepareTestInstance(Object testInstance) throws Exception {
+		getTestContextManager().prepareTestInstance(testInstance);
+	}
+
+	private void beforeExecutionHooks(Object testInstance, Method testMethod) throws Exception {
+		getTestContextManager().beforeTestMethod(testInstance, testMethod);
+	}
+
+	private void beforeExecution(Object testInstance, Method testMethod) throws Exception {
+		getTestContextManager().beforeTestExecution(testInstance, testMethod);
+	}
+
+	public void afterExecution(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+		getTestContextManager().afterTestExecution(testInstance, testMethod, testException);
+	}
+
+	private void afterExecutionHooks(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+		getTestContextManager().afterTestMethod(testInstance, testMethod, testException);
+	}
 
 	/**
 	 * Determine if the value for the {@link Parameter} in the supplied {@link ParameterContext}

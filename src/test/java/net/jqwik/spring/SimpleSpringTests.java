@@ -13,7 +13,7 @@ class SimpleSpringTests {
 	@Autowired
 	MyBean myBean;
 
-	@Example
+	@Property(tries = 5)
 	void accessAutowiredBean() {
 		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
 	}
