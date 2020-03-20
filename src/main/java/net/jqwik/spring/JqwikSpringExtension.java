@@ -14,117 +14,36 @@ import org.springframework.test.context.support.*;
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
  */
 @API(status = API.Status.EXPERIMENTAL, since = "0.1.0")
-public class JqwikSpringExtension implements BeforeContainerHook, AfterContainerHook, AroundTryHook {
+public class JqwikSpringExtension implements RegistrarHook {
 
-	@Override
-	public PropagationMode propagateTo() {
-		return PropagationMode.DIRECT_DESCENDANTS;
+	public static Optional<TestContextManager> getTestContextManager(LifecycleContext context) {
+		Store<TestContextManager> store = testContextManagerStore(context);
+		if (store != null) {
+			return Optional.of(store.get());
+		}
+		return Optional.empty();
 	}
 
-	private Store<TestContextManager> testContextManager;
-
-	@Override
-	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
-		// Only apply to container classes and methods
-		return optionalElement.map(element -> (element instanceof Class) || (element instanceof Method)).orElse(false);
-	}
-
-	@Override
-	public void prepareFor(LifecycleContext context) {
-		testContextManager = testContextManagerStore(context);
-	}
-
-	private Store<TestContextManager> testContextManagerStore(LifecycleContext context) {
-		Optional<Class<?>> optionalContainerClass = optionalContainerClass(context);
+	private static Store<TestContextManager> testContextManagerStore(LifecycleContext context) {
+		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
 		return optionalContainerClass.map(
 				containerClass -> Store.getOrCreate(
-						Tuple.of(this, containerClass),
+						Tuple.of(JqwikSpringExtension.class, containerClass),
 						Lifespan.RUN,
 						() -> new TestContextManager(containerClass)
 				)).orElse(null);
 	}
 
-	private Optional<Class<?>> optionalContainerClass(LifecycleContext context) {
-		if (context instanceof ContainerLifecycleContext) {
-			ContainerLifecycleContext containerLifecycleContext = (ContainerLifecycleContext) context;
-			return containerLifecycleContext.containerClass();
-		}
-		if (context instanceof PropertyLifecycleContext) {
-			PropertyLifecycleContext propertyLifecycleContext = (PropertyLifecycleContext) context;
-			return Optional.of(propertyLifecycleContext.containerClass());
-		}
-		if (context instanceof TryLifecycleContext) {
-			TryLifecycleContext propertyLifecycleContext = (TryLifecycleContext) context;
-			return Optional.of(propertyLifecycleContext.propertyContext().containerClass());
-		}
-		return Optional.empty();
-	}
-
-	private TestContextManager getTestContextManager() {
-		return testContextManager.get();
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to container classes
+		return optionalElement.map(element -> element instanceof Class).orElse(false);
 	}
 
 	@Override
-	public void beforeContainer(ContainerLifecycleContext context) throws Exception {
-		getTestContextManager().beforeTestClass();
-	}
-
-	@Override
-	public void afterContainer(ContainerLifecycleContext context) throws Exception {
-		getTestContextManager().afterTestClass();
-	}
-
-	@Override
-	public int beforeContainerProximity() {
-		return -20;
-	}
-
-	@Override
-	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
-		Object testInstance = context.propertyContext().testInstance();
-		prepareTestInstance(testInstance);
-		Method testMethod = context.propertyContext().targetMethod();
-		beforeExecutionHooks(testInstance, testMethod);
-
-		// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
-		beforeExecution(testInstance, testMethod);
-
-		Throwable testException = null;
-		try {
-			TryExecutionResult executionResult = aTry.execute(parameters);
-			testException = executionResult.throwable().orElse(null);
-			return executionResult;
-		} finally {
-			// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
-			afterExecution(testInstance, testMethod, testException);
-
-			afterExecutionHooks(testInstance, testMethod, testException);
-		}
-	}
-
-	@Override
-	public int aroundTryProximity() {
-		return -20;
-	}
-
-	private void prepareTestInstance(Object testInstance) throws Exception {
-		getTestContextManager().prepareTestInstance(testInstance);
-	}
-
-	private void beforeExecutionHooks(Object testInstance, Method testMethod) throws Exception {
-		getTestContextManager().beforeTestMethod(testInstance, testMethod);
-	}
-
-	private void beforeExecution(Object testInstance, Method testMethod) throws Exception {
-		getTestContextManager().beforeTestExecution(testInstance, testMethod);
-	}
-
-	public void afterExecution(Object testInstance, Method testMethod, Throwable testException) throws Exception {
-		getTestContextManager().afterTestExecution(testInstance, testMethod, testException);
-	}
-
-	private void afterExecutionHooks(Object testInstance, Method testMethod, Throwable testException) throws Exception {
-		getTestContextManager().afterTestMethod(testInstance, testMethod, testException);
+	public void registerHooks(Registrar registrar) {
+		registrar.register(AroundContainer.class, PropagationMode.NO_DESCENDANTS);
+		registrar.register(OutsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
 	}
 
 	/**
@@ -187,5 +106,101 @@ public class JqwikSpringExtension implements BeforeContainerHook, AfterContainer
 //	public static ApplicationContext getApplicationContext(ExtensionContext context) {
 //		return getTestContextManager(context).getTestContext().getApplicationContext();
 //	}
+
+}
+
+class AroundContainer implements BeforeContainerHook, AfterContainerHook {
+
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to container classes
+		return optionalElement.map(element -> element instanceof Class).orElse(false);
+	}
+
+	@Override
+	public void beforeContainer(ContainerLifecycleContext context) throws Exception {
+		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
+		if (optionalTestContextManager.isPresent()) {
+			optionalTestContextManager.get().beforeTestClass();
+		}
+	}
+
+	@Override
+	public void afterContainer(ContainerLifecycleContext context) throws Exception {
+		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
+		if (optionalTestContextManager.isPresent()) {
+			optionalTestContextManager.get().afterTestClass();
+		}
+	}
+
+	@Override
+	public int beforeContainerProximity() {
+		return -20;
+	}
+
+}
+
+class OutsideHooks implements AroundTryHook {
+
+	private TestContextManager testContextManager;
+
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to methods
+		return optionalElement.map(element -> element instanceof Method).orElse(false);
+	}
+
+	@Override
+	public void prepareFor(LifecycleContext context) {
+		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
+	}
+
+	@Override
+	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
+		Object testInstance = context.propertyContext().testInstance();
+		prepareTestInstance(testInstance);
+		Method testMethod = context.propertyContext().targetMethod();
+		beforeExecutionHooks(testInstance, testMethod);
+
+		// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
+		beforeExecution(testInstance, testMethod);
+
+		Throwable testException = null;
+		try {
+			TryExecutionResult executionResult = aTry.execute(parameters);
+			testException = executionResult.throwable().orElse(null);
+			return executionResult;
+		} finally {
+			// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
+			afterExecution(testInstance, testMethod, testException);
+
+			afterExecutionHooks(testInstance, testMethod, testException);
+		}
+	}
+
+	@Override
+	public int aroundTryProximity() {
+		return -20;
+	}
+
+	private void prepareTestInstance(Object testInstance) throws Exception {
+		testContextManager.prepareTestInstance(testInstance);
+	}
+
+	private void beforeExecutionHooks(Object testInstance, Method testMethod) throws Exception {
+		testContextManager.beforeTestMethod(testInstance, testMethod);
+	}
+
+	private void beforeExecution(Object testInstance, Method testMethod) throws Exception {
+		testContextManager.beforeTestExecution(testInstance, testMethod);
+	}
+
+	public void afterExecution(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+		testContextManager.afterTestExecution(testInstance, testMethod, testException);
+	}
+
+	private void afterExecutionHooks(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+		testContextManager.afterTestMethod(testInstance, testMethod, testException);
+	}
 
 }
