@@ -14,7 +14,7 @@ import org.springframework.test.context.support.*;
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
  */
 @API(status = API.Status.EXPERIMENTAL, since = "0.1.0")
-public class JqwikSpringExtension implements RegistrarHook {
+public class JqwikSpringExtension implements RegistrarHook, BeforeContainerHook {
 
 	public static Optional<TestContextManager> getTestContextManager(LifecycleContext context) {
 		Store<TestContextManager> store = testContextManagerStore(context);
@@ -27,11 +27,8 @@ public class JqwikSpringExtension implements RegistrarHook {
 	private static Store<TestContextManager> testContextManagerStore(LifecycleContext context) {
 		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
 		return optionalContainerClass.map(
-				containerClass -> Store.getOrCreate(
-						Tuple.of(JqwikSpringExtension.class, containerClass),
-						Lifespan.RUN,
-						() -> new TestContextManager(containerClass)
-				)).orElse(null);
+				containerClass -> Store.<TestContextManager>get(storeIdentifier(containerClass))
+		).orElse(null);
 	}
 
 	@Override
@@ -41,11 +38,163 @@ public class JqwikSpringExtension implements RegistrarHook {
 	}
 
 	@Override
+	public void beforeContainer(ContainerLifecycleContext context) {
+		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
+		optionalContainerClass.ifPresent(
+				containerClass -> Store.getOrCreate(
+						storeIdentifier(containerClass),
+						Lifespan.RUN,
+						() -> new TestContextManager(containerClass)
+				));
+	}
+
+	private static Tuple.Tuple2<?, ?> storeIdentifier(Class<?> containerClass) {
+		return Tuple.of(JqwikSpringExtension.class, containerClass);
+	}
+
+	@Override
+	public int beforeContainerProximity() {
+		return -30;
+	}
+
+	@Override
 	public void registerHooks(Registrar registrar) {
 		registrar.register(AroundContainer.class, PropagationMode.NO_DESCENDANTS);
 		registrar.register(OutsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
+		registrar.register(InsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
 	}
 
+}
+
+class AroundContainer implements BeforeContainerHook, AfterContainerHook {
+
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to container classes
+		return optionalElement.map(element -> element instanceof Class).orElse(false);
+	}
+
+	@Override
+	public void beforeContainer(ContainerLifecycleContext context) throws Exception {
+		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
+		if (optionalTestContextManager.isPresent()) {
+			optionalTestContextManager.get().beforeTestClass();
+		}
+	}
+
+	@Override
+	public void afterContainer(ContainerLifecycleContext context) throws Exception {
+		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
+		if (optionalTestContextManager.isPresent()) {
+			optionalTestContextManager.get().afterTestClass();
+		}
+	}
+
+	@Override
+	public int beforeContainerProximity() {
+		return -20;
+	}
+
+}
+
+class OutsideHooks implements AroundTryHook {
+
+	private TestContextManager testContextManager;
+
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to methods
+		return optionalElement.map(element -> element instanceof Method).orElse(false);
+	}
+
+	@Override
+	public void prepareFor(LifecycleContext context) {
+		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
+	}
+
+	@Override
+	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
+		Object testInstance = context.propertyContext().testInstance();
+		prepareTestInstance(testInstance);
+		Method testMethod = context.propertyContext().targetMethod();
+		beforeExecutionHooks(testInstance, testMethod);
+
+		Throwable testException = null;
+		try {
+			TryExecutionResult executionResult = aTry.execute(parameters);
+			testException = executionResult.throwable().orElse(null);
+			return executionResult;
+		} finally {
+			afterExecutionHooks(testInstance, testMethod, testException);
+		}
+	}
+
+	@Override
+	public int aroundTryProximity() {
+		return -20;
+	}
+
+	private void prepareTestInstance(Object testInstance) throws Exception {
+		testContextManager.prepareTestInstance(testInstance);
+	}
+
+	private void beforeExecutionHooks(Object testInstance, Method testMethod) throws Exception {
+		testContextManager.beforeTestMethod(testInstance, testMethod);
+	}
+
+	private void afterExecutionHooks(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+		testContextManager.afterTestMethod(testInstance, testMethod, testException);
+	}
+
+}
+
+class InsideHooks implements AroundTryHook {
+
+	private TestContextManager testContextManager;
+
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to methods
+		return optionalElement.map(element -> element instanceof Method).orElse(false);
+	}
+
+	@Override
+	public void prepareFor(LifecycleContext context) {
+		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
+	}
+
+	@Override
+	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
+		Object testInstance = context.propertyContext().testInstance();
+		Method testMethod = context.propertyContext().targetMethod();
+
+		beforeExecution(testInstance, testMethod);
+
+		Throwable testException = null;
+		try {
+			TryExecutionResult executionResult = aTry.execute(parameters);
+			testException = executionResult.throwable().orElse(null);
+			return executionResult;
+		} finally {
+			afterExecution(testInstance, testMethod, testException);
+		}
+	}
+
+	@Override
+	public int aroundTryProximity() {
+		return 100;
+	}
+
+	private void beforeExecution(Object testInstance, Method testMethod) throws Exception {
+		testContextManager.beforeTestExecution(testInstance, testMethod);
+	}
+
+	public void afterExecution(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+		testContextManager.afterTestExecution(testInstance, testMethod, testException);
+	}
+}
+
+class ResolveSpringParameters {
 	/**
 	 * Determine if the value for the {@link Parameter} in the supplied {@link ParameterContext}
 	 * should be autowired from the test's {@link ApplicationContext}.
@@ -107,100 +256,5 @@ public class JqwikSpringExtension implements RegistrarHook {
 //		return getTestContextManager(context).getTestContext().getApplicationContext();
 //	}
 
-}
-
-class AroundContainer implements BeforeContainerHook, AfterContainerHook {
-
-	@Override
-	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
-		// Only apply to container classes
-		return optionalElement.map(element -> element instanceof Class).orElse(false);
-	}
-
-	@Override
-	public void beforeContainer(ContainerLifecycleContext context) throws Exception {
-		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
-		if (optionalTestContextManager.isPresent()) {
-			optionalTestContextManager.get().beforeTestClass();
-		}
-	}
-
-	@Override
-	public void afterContainer(ContainerLifecycleContext context) throws Exception {
-		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
-		if (optionalTestContextManager.isPresent()) {
-			optionalTestContextManager.get().afterTestClass();
-		}
-	}
-
-	@Override
-	public int beforeContainerProximity() {
-		return -20;
-	}
-
-}
-
-class OutsideHooks implements AroundTryHook {
-
-	private TestContextManager testContextManager;
-
-	@Override
-	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
-		// Only apply to methods
-		return optionalElement.map(element -> element instanceof Method).orElse(false);
-	}
-
-	@Override
-	public void prepareFor(LifecycleContext context) {
-		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
-	}
-
-	@Override
-	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
-		Object testInstance = context.propertyContext().testInstance();
-		prepareTestInstance(testInstance);
-		Method testMethod = context.propertyContext().targetMethod();
-		beforeExecutionHooks(testInstance, testMethod);
-
-		// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
-		beforeExecution(testInstance, testMethod);
-
-		Throwable testException = null;
-		try {
-			TryExecutionResult executionResult = aTry.execute(parameters);
-			testException = executionResult.throwable().orElse(null);
-			return executionResult;
-		} finally {
-			// TODO: Should run with high proximity (closer than normal hooks), maybe 100:
-			afterExecution(testInstance, testMethod, testException);
-
-			afterExecutionHooks(testInstance, testMethod, testException);
-		}
-	}
-
-	@Override
-	public int aroundTryProximity() {
-		return -20;
-	}
-
-	private void prepareTestInstance(Object testInstance) throws Exception {
-		testContextManager.prepareTestInstance(testInstance);
-	}
-
-	private void beforeExecutionHooks(Object testInstance, Method testMethod) throws Exception {
-		testContextManager.beforeTestMethod(testInstance, testMethod);
-	}
-
-	private void beforeExecution(Object testInstance, Method testMethod) throws Exception {
-		testContextManager.beforeTestExecution(testInstance, testMethod);
-	}
-
-	public void afterExecution(Object testInstance, Method testMethod, Throwable testException) throws Exception {
-		testContextManager.afterTestExecution(testInstance, testMethod, testException);
-	}
-
-	private void afterExecutionHooks(Object testInstance, Method testMethod, Throwable testException) throws Exception {
-		testContextManager.afterTestMethod(testInstance, testMethod, testException);
-	}
 
 }

@@ -15,6 +15,7 @@ class SimpleSpringTests {
 
 	@Property(tries = 5)
 	void accessAutowiredBean() {
+//		System.out.println(">>>>>>>>>>>>>>>>>>>> " + myBean);
 		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
 	}
 }

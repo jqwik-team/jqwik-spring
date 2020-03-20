@@ -1,8 +1,5 @@
 package net.jqwik.spring;
 
-import net.jqwik.api.*;
-import net.jqwik.api.lifecycle.*;
-import org.assertj.core.api.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
@@ -18,7 +15,14 @@ class SimpleSpringJupiterTests {
 	MyBean myBean;
 
 	@Test
-	void accessAutowiredBean() {
+	void accessAutowiredBean1() {
+//		System.out.println(">>>>>>>>>>>>>>>>>>>> " + myBean);
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+	}
+
+	@Test
+	void accessAutowiredBean2() {
+//		System.out.println(">>>>>>>>>>>>>>>>>>>> " + myBean);
 		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
 	}
 }
