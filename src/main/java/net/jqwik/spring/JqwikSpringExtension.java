@@ -6,9 +6,9 @@ import java.util.*;
 import net.jqwik.api.*;
 import net.jqwik.api.lifecycle.*;
 import org.apiguardian.api.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.*;
 import org.springframework.test.context.*;
-import org.springframework.test.context.support.*;
 
 /**
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
@@ -62,6 +62,7 @@ public class JqwikSpringExtension implements RegistrarHook, BeforeContainerHook 
 		registrar.register(AroundContainer.class, PropagationMode.NO_DESCENDANTS);
 		registrar.register(OutsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
 		registrar.register(InsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
+		registrar.register(ResolveSpringParameters.class, PropagationMode.DIRECT_DESCENDANTS);
 	}
 
 }
@@ -194,38 +195,64 @@ class InsideHooks implements AroundTryHook {
 	}
 }
 
-class ResolveSpringParameters {
-	/**
-	 * Determine if the value for the {@link Parameter} in the supplied {@link ParameterContext}
-	 * should be autowired from the test's {@link ApplicationContext}.
-	 * <p>A parameter is considered to be autowirable if one of the following
-	 * conditions is {@code true}.
-	 * <ol>
-	 * <li>The {@linkplain ParameterContext#getDeclaringExecutable() declaring
-	 * executable} is a {@link Constructor} and
-	 * {@link TestConstructorUtils#isAutowirableConstructor(Constructor, Class)}
-	 * returns {@code true}.</li>
-	 * <li>The parameter is of type {@link ApplicationContext} or a sub-type thereof.</li>
-	 * <li>{@link ParameterResolutionDelegate#isAutowirable} returns {@code true}.</li>
-	 * </ol>
-	 * <p><strong>WARNING</strong>: If a test class {@code Constructor} is annotated
-	 * with {@code @Autowired} or automatically autowirable (see {@link TestConstructor}),
-	 * Spring will assume the responsibility for resolving all parameters in the
-	 * constructor. Consequently, no other registered {@link ParameterResolver}
-	 * will be able to resolve parameters.
-	 * @see #resolveParameter
-	 * @see TestConstructorUtils#isAutowirableConstructor(Constructor, Class)
-	 * @see ParameterResolutionDelegate#isAutowirable
-	 */
-//	@Override
-//	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-//		Parameter parameter = parameterContext.getParameter();
-//		Executable executable = parameter.getDeclaringExecutable();
-//		Class<?> testClass = extensionContext.getRequiredTestClass();
-//		return (TestConstructorUtils.isAutowirableConstructor(executable, testClass) ||
-//						ApplicationContext.class.isAssignableFrom(parameter.getType()) ||
-//						ParameterResolutionDelegate.isAutowirable(parameter, parameterContext.getIndex()));
-//	}
+class ResolveSpringParameters implements ResolveParameterHook {
+
+	private TestContextManager testContextManager;
+
+	@Override
+	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
+		// Only apply to methods
+		return optionalElement.map(element -> element instanceof Method).orElse(false);
+	}
+
+	@Override
+	public void prepareFor(LifecycleContext context) {
+		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
+	}
+
+	@Override
+	public Optional<ParameterSupplier> resolve(ParameterResolutionContext parameterContext) {
+
+		Parameter parameter = parameterContext.parameter();
+
+		if (canParameterBeResolved(parameterContext.index(), parameter)) {
+			return Optional.of(new SpringSupplier(parameterContext));
+		}
+
+		return Optional.empty();
+	}
+
+	private boolean canParameterBeResolved(int index, Parameter parameter) {
+		// TODO: Allow autowirable Constructor (see JUnit 5 SpringExtension)
+		return ApplicationContext.class.isAssignableFrom(parameter.getType()) ||
+					   ParameterResolutionDelegate.isAutowirable(parameter, index);
+	}
+
+	private class SpringSupplier implements ResolveParameterHook.ParameterSupplier {
+
+		private ParameterResolutionContext parameterContext;
+
+		public SpringSupplier(ParameterResolutionContext parameterContext) {
+			this.parameterContext = parameterContext;
+		}
+
+		@Override
+		public Object get(LifecycleContext lifecycleContext) {
+			Parameter parameter = parameterContext.parameter();
+			int index = parameterContext.index();
+			return lifecycleContext.optionalContainerClass().map(testClass -> {
+				ApplicationContext applicationContext = testContextManager.getTestContext().getApplicationContext();
+				return ParameterResolutionDelegate.resolveDependency(
+						parameter,
+						index,
+						testClass,
+						applicationContext.getAutowireCapableBeanFactory()
+				);
+			}).orElseThrow(() -> {
+				String message = "Trying to resolve Spring parameter outside method context";
+				return new JqwikException(message);});
+		}
+	}
 
 	/**
 	 * Resolve a value for the {@link Parameter} in the supplied {@link ParameterContext} by
@@ -255,6 +282,5 @@ class ResolveSpringParameters {
 //	public static ApplicationContext getApplicationContext(ExtensionContext context) {
 //		return getTestContextManager(context).getTestContext().getApplicationContext();
 //	}
-
 
 }

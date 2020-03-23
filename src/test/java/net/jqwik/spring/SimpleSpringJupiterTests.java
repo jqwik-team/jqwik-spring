@@ -15,14 +15,23 @@ class SimpleSpringJupiterTests {
 	MyBean myBean;
 
 	@Test
-	void accessAutowiredBean1() {
-//		System.out.println(">>>>>>>>>>>>>>>>>>>> " + myBean);
+	void accessAutowiredBean() {
 		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
 	}
 
 	@Test
-	void accessAutowiredBean2() {
-//		System.out.println(">>>>>>>>>>>>>>>>>>>> " + myBean);
-		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+	void accessInjectedBean(@Autowired MyBean injected) {
+		Assertions.assertThat(injected.sayHello()).isEqualTo("hello");
 	}
+
+	@Test
+	void accessBeanWithPrototypeScope1(@Autowired PrototypeBean prototype) {
+		System.out.println("Prototype 1 = " + prototype.hashCode());
+	}
+
+	@Test
+	void accessBeanWithPrototypeScope2(@Autowired PrototypeBean prototype) {
+		System.out.println("Prototype 2 = " + prototype.hashCode());
+	}
+
 }
