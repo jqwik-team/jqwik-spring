@@ -18,4 +18,9 @@ public class TestConfig {
 		return new PrototypeBean();
 	}
 
+	@Bean(name = "TestName")
+	String testName() {
+		return "The Test Name";
+	}
+
 }

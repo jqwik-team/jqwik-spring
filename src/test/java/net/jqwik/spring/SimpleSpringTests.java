@@ -13,6 +13,11 @@ import org.springframework.test.context.*;
 class SimpleSpringTests {
 
 	@Autowired
+	public SimpleSpringTests(@Qualifier("TestName") String testName) {
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@Autowired
 	MyBean myBean;
 
 	@Property(tries = 5)
@@ -28,7 +33,8 @@ class SimpleSpringTests {
 	@Property(tries = 5)
 	@AddLifecycleHook(EnsureDifferentPrototypeInstances.class)
 	void accessBeanWithPrototypeScope(@Autowired PrototypeBean prototype) {
-		System.out.println("Prototype = " + prototype.hashCode());
+		Assertions.assertThat(prototype).isNotNull();
+		// System.out.println("Prototype = " + prototype.hashCode());
 	}
 
 	private static class EnsureDifferentPrototypeInstances implements AroundTryHook, AroundPropertyHook {

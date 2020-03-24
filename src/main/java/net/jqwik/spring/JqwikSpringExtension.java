@@ -14,21 +14,15 @@ import org.springframework.test.context.*;
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
  */
 @API(status = API.Status.EXPERIMENTAL, since = "0.1.0")
-public class JqwikSpringExtension implements RegistrarHook, BeforeContainerHook {
+public class JqwikSpringExtension implements RegistrarHook {
 
 	public static Optional<TestContextManager> getTestContextManager(LifecycleContext context) {
-		Store<TestContextManager> store = testContextManagerStore(context);
-		if (store != null) {
-			return Optional.of(store.get());
-		}
-		return Optional.empty();
+		return testContextManagerStore(context).map(store -> store.get());
 	}
 
-	private static Store<TestContextManager> testContextManagerStore(LifecycleContext context) {
+	private static Optional<Store<TestContextManager>> testContextManagerStore(LifecycleContext context) {
 		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
-		return optionalContainerClass.map(
-				containerClass -> Store.<TestContextManager>get(storeIdentifier(containerClass))
-		).orElse(null);
+		return optionalContainerClass.map(JqwikSpringExtension::getOrCreateTestContextManagerStore);
 	}
 
 	@Override
@@ -37,24 +31,16 @@ public class JqwikSpringExtension implements RegistrarHook, BeforeContainerHook 
 		return optionalElement.map(element -> element instanceof Class).orElse(false);
 	}
 
-	@Override
-	public void beforeContainer(ContainerLifecycleContext context) {
-		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
-		optionalContainerClass.ifPresent(
-				containerClass -> Store.getOrCreate(
-						storeIdentifier(containerClass),
-						Lifespan.RUN,
-						() -> new TestContextManager(containerClass)
-				));
+	private static Store<TestContextManager> getOrCreateTestContextManagerStore(Class<?> containerClass) {
+		return Store.getOrCreate(
+				storeIdentifier(containerClass),
+				Lifespan.RUN,
+				() -> new TestContextManager(containerClass)
+		);
 	}
 
 	private static Tuple.Tuple2<?, ?> storeIdentifier(Class<?> containerClass) {
 		return Tuple.of(JqwikSpringExtension.class, containerClass);
-	}
-
-	@Override
-	public int beforeContainerProximity() {
-		return -30;
 	}
 
 	@Override
@@ -200,12 +186,6 @@ class ResolveSpringParameters implements ResolveParameterHook {
 	private TestContextManager testContextManager;
 
 	@Override
-	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
-		// Only apply to methods
-		return optionalElement.map(element -> element instanceof Method).orElse(false);
-	}
-
-	@Override
 	public void prepareFor(LifecycleContext context) {
 		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
 	}
@@ -223,7 +203,6 @@ class ResolveSpringParameters implements ResolveParameterHook {
 	}
 
 	private boolean canParameterBeResolved(int index, Parameter parameter) {
-		// TODO: Allow autowirable Constructor (see JUnit 5 SpringExtension)
 		return ApplicationContext.class.isAssignableFrom(parameter.getType()) ||
 					   ParameterResolutionDelegate.isAutowirable(parameter, index);
 	}
@@ -249,38 +228,12 @@ class ResolveSpringParameters implements ResolveParameterHook {
 						applicationContext.getAutowireCapableBeanFactory()
 				);
 			}).orElseThrow(() -> {
-				String message = "Trying to resolve Spring parameter outside method context";
-				return new JqwikException(message);});
+				String message = String.format(
+						"Trying to resolve Spring parameter outside container context: %s",
+						lifecycleContext.label()
+				);
+				return new JqwikException(message);
+			});
 		}
 	}
-
-	/**
-	 * Resolve a value for the {@link Parameter} in the supplied {@link ParameterContext} by
-	 * retrieving the corresponding dependency from the test's {@link ApplicationContext}.
-	 * <p>Delegates to {@link ParameterResolutionDelegate#resolveDependency}.
-	 * @see #supportsParameter
-	 * @see ParameterResolutionDelegate#resolveDependency
-	 */
-//	@Override
-//	@Nullable
-//	public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-//		Parameter parameter = parameterContext.getParameter();
-//		int index = parameterContext.getIndex();
-//		Class<?> testClass = extensionContext.getRequiredTestClass();
-//		ApplicationContext applicationContext = getApplicationContext(extensionContext);
-//		return ParameterResolutionDelegate.resolveDependency(parameter, index, testClass,
-//															 applicationContext.getAutowireCapableBeanFactory());
-//	}
-
-	/**
-	 * Get the {@link ApplicationContext} associated with the supplied {@code ExtensionContext}.
-	 * @param context the current {@code ExtensionContext} (never {@code null})
-	 * @return the application context
-	 * @throws IllegalStateException if an error occurs while retrieving the application context
-	 * @see org.springframework.test.context.TestContext#getApplicationContext()
-	 */
-//	public static ApplicationContext getApplicationContext(ExtensionContext context) {
-//		return getTestContextManager(context).getTestContext().getApplicationContext();
-//	}
-
 }

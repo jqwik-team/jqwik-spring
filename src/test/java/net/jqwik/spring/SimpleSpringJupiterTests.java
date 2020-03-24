@@ -12,6 +12,11 @@ import org.springframework.test.context.junit.jupiter.*;
 class SimpleSpringJupiterTests {
 
 	@Autowired
+	public SimpleSpringJupiterTests(@Qualifier("TestName") String testName) {
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@Autowired
 	MyBean myBean;
 
 	@Test
@@ -26,12 +31,14 @@ class SimpleSpringJupiterTests {
 
 	@Test
 	void accessBeanWithPrototypeScope1(@Autowired PrototypeBean prototype) {
-		System.out.println("Prototype 1 = " + prototype.hashCode());
+		Assertions.assertThat(prototype).isNotNull();
+		//System.out.println("Prototype 1 = " + prototype.hashCode());
 	}
 
 	@Test
 	void accessBeanWithPrototypeScope2(@Autowired PrototypeBean prototype) {
-		System.out.println("Prototype 2 = " + prototype.hashCode());
+		Assertions.assertThat(prototype).isNotNull();
+		//System.out.println("Prototype 2 = " + prototype.hashCode());
 	}
 
 }
