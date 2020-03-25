@@ -7,30 +7,31 @@ import org.apiguardian.api.*;
 import org.springframework.context.*;
 import org.springframework.core.annotation.*;
 import org.springframework.test.context.*;
+import org.springframework.test.context.web.*;
 
 import static org.apiguardian.api.API.Status.*;
 
 /**
- * {@code @SpringJqwikConfig} is a combines
+ * {@code @SpringJqwikWebConfig} is combines
  * {@link AddLifecycleHook @AddLifecycleHook(JqwikSpringExtension.class)} from jqwik with
- * {@link ContextConfiguration @ContextConfiguration} from the
+ * {@link ContextConfiguration @ContextConfiguration} and
+ * {@link WebAppConfiguration @WebAppConfiguration} from the
  * <em>Spring TestContext Framework</em>.
- *
- * This works - basically - like {@link org.springframework.test.context.junit.jupiter.SpringJUnitConfig}
- * but for jqwik properties and examples.
  *
  * @see JqwikSpringExtension
  * @see ContextConfiguration
- * @see SpringJqwikWebConfig
+ * @see WebAppConfiguration
+ * @see SpringJqwikConfig
  */
 @AddLifecycleHook(JqwikSpringExtension.class)
 @ContextConfiguration
+@WebAppConfiguration
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @API(status = EXPERIMENTAL, since = "0.5.0")
-public @interface SpringJqwikConfig {
+public @interface SpringJqwikWebConfig {
 
 	/**
 	 * Alias for {@link ContextConfiguration#classes}.
@@ -73,5 +74,11 @@ public @interface SpringJqwikConfig {
 	 */
 	@AliasFor(annotation = ContextConfiguration.class)
 	String name() default "";
+
+	/**
+	 * Alias for {@link WebAppConfiguration#value}.
+	 */
+	@AliasFor(annotation = WebAppConfiguration.class, attribute = "value")
+	String resourcePath() default "src/main/webapp";
 
 }

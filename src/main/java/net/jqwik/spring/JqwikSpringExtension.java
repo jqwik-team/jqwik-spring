@@ -13,7 +13,7 @@ import org.springframework.test.context.*;
 /**
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
  */
-@API(status = API.Status.EXPERIMENTAL, since = "0.1.0")
+@API(status = API.Status.EXPERIMENTAL, since = "0.5.0")
 public class JqwikSpringExtension implements RegistrarHook {
 
 	public static Optional<TestContextManager> getTestContextManager(LifecycleContext context) {

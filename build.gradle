@@ -79,6 +79,7 @@ dependencies {
 	testImplementation("org.assertj:assertj-core:${assertJVersion}")
 
 	testImplementation("org.mockito:mockito-core")
+	testImplementation("org.springframework.boot:spring-boot-starter-web")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
 	testImplementation("org.junit.jupiter:junit-jupiter-api")
