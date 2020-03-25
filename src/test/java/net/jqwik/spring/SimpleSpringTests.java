@@ -20,6 +20,42 @@ class SimpleSpringTests {
 	@Autowired
 	MyBean myBean;
 
+	@BeforeContainer
+	static void beforeContainer(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@AfterContainer
+	static void afterContainer(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@BeforeProperty
+	void beforeProperty(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@AfterProperty
+	void afterProperty(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@BeforeTry
+	void beforeTry(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
+	@AfterTry
+	void afterTry(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
+		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
+		Assertions.assertThat(testName).isEqualTo("The Test Name");
+	}
+
 	@Property(tries = 5)
 	void accessAutowiredBean() {
 		Assertions.assertThat(myBean.sayHello()).isEqualTo("hello");
