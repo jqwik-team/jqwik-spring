@@ -9,6 +9,7 @@ import org.apiguardian.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.*;
 import org.springframework.test.context.*;
+import org.springframework.test.context.support.*;
 
 /**
  * This class includes all the jqwik hooks necessary to use spring in examples and properties
@@ -204,7 +205,18 @@ class ResolveSpringParameters implements ResolveParameterHook {
 
 	private boolean canParameterBeResolved(int index, Parameter parameter) {
 		return ApplicationContext.class.isAssignableFrom(parameter.getType()) ||
-					   ParameterResolutionDelegate.isAutowirable(parameter, index);
+					   ParameterResolutionDelegate.isAutowirable(parameter, index) ||
+					   isAutowirableConstructor(parameter);
+	}
+
+	private boolean isAutowirableConstructor(Parameter parameter) {
+		Executable executable = parameter.getDeclaringExecutable();
+
+		// TODO: This should be the testContainerClass
+		//       which might be different in case of inheritance
+		Class<?> testClass = executable.getDeclaringClass();
+
+		return TestConstructorUtils.isAutowirableConstructor(executable, testClass);
 	}
 
 	private class SpringSupplier implements ResolveParameterHook.ParameterSupplier {
