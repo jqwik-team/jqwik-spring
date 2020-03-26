@@ -52,11 +52,11 @@ test {
 		includeEngines 'jqwik'
 	}
 
-	include '**/*Properties.class'
-	include '**/*Example.class'
-	include '**/*Examples.class'
-	include '**/*Test.class'
-	include '**/*Tests.class'
+	include '/net/jqwik/spring/**/*Properties.class'
+	include '/net/jqwik/spring/**/*Example.class'
+	include '/net/jqwik/spring/**/*Examples.class'
+	include '/net/jqwik/spring/**/*Test.class'
+	include '/net/jqwik/spring/**/*Tests.class'
 
 	// testLogging.showStandardStreams = true
 }
