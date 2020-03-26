@@ -67,14 +67,14 @@ import org.springframework.test.context.*;
 @ContextConfiguration(classes = MySpringConfig.class)
 public class MySpringProperties {
 
-	@Autowired
-	MySpringBean mySpringBean;
+  @Autowired
+  MySpringBean mySpringBean;
 
-	@Property
-	void nameIsAddedToHello(@ForAll @AlphaChars @StringLength(min = 1) String name) {
-		String greeting = mySpringBean.sayHello(name);
-		Assertions.assertTrue(greeting.contains(name));
-	}
+  @Property
+  void nameIsAddedToHello(@ForAll @AlphaChars @StringLength(min = 1) String name) {
+    String greeting = mySpringBean.sayHello(name);
+    Assertions.assertTrue(greeting.contains(name));
+  }
 }
 ```
 
@@ -101,20 +101,20 @@ Compare the following two properties:
 @ContextConfiguration(classes = MySpringConfig.class)
 public class MySpringProperties {
 
-	@Property(tries = 10)
-	void counterIsCountingUp(@Autowired MyCounter counter) {
-		counter.inc();
-        // Prints out 1, 2, 3 ... 10
-		System.out.println(counter.value());
-	}
+  @Property(tries = 10)
+  void counterIsCountingUp(@Autowired MyCounter counter) {
+    counter.inc();
+    // Prints out 1, 2, 3 ... 10
+    System.out.println(counter.value());
+  }
 
-	@Property(tries = 10)
-	@DirtiesContext
-	void counterIsAlways1(@Autowired MyCounter counter) {
-		counter.inc();
-        // Prints out 1, 1, 1 ... 1
-		System.out.println(counter.value());
-	}
+  @Property(tries = 10)
+  @DirtiesContext
+  void counterIsAlways1(@Autowired MyCounter counter) {
+    counter.inc();
+    // Prints out 1, 1, 1 ... 1
+    System.out.println(counter.value());
+  }
 }
 ```
 
