@@ -118,7 +118,17 @@ public class MySpringProperties {
 }
 ```
 
-### Parameter injection
+### Parameter Resolution of Autowired Beans 
+
+Autowired beans will be injected as parameters in all 
+[lifecycle methods](https://jqwik.net/docs/current/user-guide.html#annotated-lifecycle-methods)
+and also in the test container class's constructor - if there is only one:
+
+```java
+class MyOtherSpringProperties {
+  // TBD
+}
+```
 
 ### Annotations
 
