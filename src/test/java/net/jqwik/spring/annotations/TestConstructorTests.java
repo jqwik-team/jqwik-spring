@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.*;
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TestConstructorTests {
 
-	public TestConstructorTests(MyBean myBean) {
+	TestConstructorTests(MyBean myBean) {
 		this.myBean = myBean;
 	}
 

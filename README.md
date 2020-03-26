@@ -65,10 +65,10 @@ import org.springframework.test.context.*;
 
 @AddLifecycleHook(JqwikSpringExtension.class)
 @ContextConfiguration(classes = MySpringConfig.class)
-public class MySpringProperties {
+class MySpringProperties {
 
   @Autowired
-  MySpringBean mySpringBean;
+  private MySpringBean mySpringBean;
 
   @Property
   void nameIsAddedToHello(@ForAll @AlphaChars @StringLength(min = 1) String name) {
@@ -99,7 +99,7 @@ Compare the following two properties:
 ```java
 @AddLifecycleHook(JqwikSpringExtension.class)
 @ContextConfiguration(classes = MySpringConfig.class)
-public class MySpringProperties {
+class MySpringProperties {
 
   @Property(tries = 10)
   void counterIsCountingUp(@Autowired MyCounter counter) {
@@ -120,13 +120,29 @@ public class MySpringProperties {
 
 ### Parameter Resolution of Autowired Beans 
 
-Autowired beans will be injected as parameters in all 
+Autowired beans will be injected as parameters in example and property methods,
+in all 
 [lifecycle methods](https://jqwik.net/docs/current/user-guide.html#annotated-lifecycle-methods)
 and also in the test container class's constructor - if there is only one:
 
 ```java
+@AddLifecycleHook(JqwikSpringExtension.class)
+@ContextConfiguration(classes = MySpringConfig.class)
 class MyOtherSpringProperties {
-  // TBD
+    @Autowired
+    MyOtherSpringProperties(MySpringBean springBean) {
+        Assertions.assertNotNull(springBean);
+    }
+
+    @BeforeProperty
+    void beforeProperty(@Autowired MySpringBean springBean) {
+        Assertions.assertNotNull(springBean);
+    }
+
+    @Property
+    void beanIsInjected(@Autowired MySpringBean springBean) {
+        Assertions.assertNotNull(springBean);
+    }
 }
 ```
 

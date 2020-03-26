@@ -11,10 +11,10 @@ import org.springframework.test.context.*;
 
 @AddLifecycleHook(JqwikSpringExtension.class)
 @ContextConfiguration(classes = MySpringConfig.class)
-public class MySpringProperties {
+class MySpringProperties {
 
 	@Autowired
-	MySpringBean mySpringBean;
+	private MySpringBean mySpringBean;
 
 	@Property
 	void nameIsAddedToHello(@ForAll @AlphaChars @StringLength(min = 1) String name) {
