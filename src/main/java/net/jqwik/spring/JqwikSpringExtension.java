@@ -185,14 +185,14 @@ class InsideHooks implements AroundTryHook {
 class ResolveSpringParameters implements ResolveParameterHook {
 
 	@Override
-	public Optional<ParameterSupplier> resolve(ParameterResolutionContext parameterContext) {
+	public Optional<ParameterSupplier> resolve(ParameterResolutionContext parameterContext, LifecycleContext lifecycleContext) {
 
 		Parameter parameter = parameterContext.parameter();
 		Class<?> containerClass = parameterContext.parameter().getDeclaringExecutable().getDeclaringClass();
 		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 
 		if (canParameterBeResolved(parameterContext.index(), parameter)) {
-			return Optional.of(new SpringSupplier(parameterContext, testContextManager));
+			return Optional.of(new SpringSupplier(parameterContext, lifecycleContext, testContextManager));
 		}
 
 		return Optional.empty();
@@ -213,18 +213,21 @@ class ResolveSpringParameters implements ResolveParameterHook {
 	private static class SpringSupplier implements ResolveParameterHook.ParameterSupplier {
 
 		private ParameterResolutionContext parameterContext;
+		private LifecycleContext lifecycleContext;
 		private TestContextManager testContextManager;
 
 		public SpringSupplier(
 				ParameterResolutionContext parameterContext,
+				LifecycleContext lifecycleContext,
 				TestContextManager testContextManager
 		) {
 			this.parameterContext = parameterContext;
+			this.lifecycleContext = lifecycleContext;
 			this.testContextManager = testContextManager;
 		}
 
 		@Override
-		public Object get(LifecycleContext lifecycleContext) {
+		public Object get(Optional<TryLifecycleContext> optionalTry) {
 			Parameter parameter = parameterContext.parameter();
 			int index = parameterContext.index();
 			return lifecycleContext.optionalContainerClass().map(testClass -> {

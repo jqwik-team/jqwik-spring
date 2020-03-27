@@ -1,5 +1,6 @@
 plugins {
 	id "org.springframework.boot" version "2.2.5.RELEASE"
+//	id "org.springframework.boot" version "2.2.0.RELEASE"
 }
 
 static isSnapshotRelease(versionString) {

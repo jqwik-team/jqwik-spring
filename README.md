@@ -28,8 +28,10 @@ and add the following dependency to your `build.gradle` file:
 
 ```
 dependencies {
+    implementation("org.springframework:spring-context:5.2.4.RELEASE")
     ...
     testImplementation("net.jqwik:jqwik-spring:0.5.0")
+    testImplementation("org.springframework:spring-test:5.2.4.RELEASE")
 }
 ```
 
@@ -41,13 +43,40 @@ and add the following dependency to your `pom.xml` file:
 
 ```
 <dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-context</artifactId>
+  <version>5.2.4.RELEASE</version>
+</dependency>
+...
+<dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
   <version>0.5.0</version>
   <scope>test</scope>
 </dependency>
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-test</artifactId>
+  <version>5.2.4.RELEASE</version>
+  <scope>test</scope>
+</dependency>
 ```
 
+### Supported Spring Versions
+
+You have to provide your own version of Spring or Spring Boot through
+Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
+
+- `5.2.0-RELEASE`
+- `5.2.4-RELEASE`
+
+Please report any compatibility issues you stumble upon.
+
+### Supported JUnit Platform Versions
+
+You need at least version `1.6.0` of the JUnit platform.
+Keep in mind that if you are using Spring Boot you will have to explicitly
+set the JUnit platform version.
 
 ## Standard Usage
 
