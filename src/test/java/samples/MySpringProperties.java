@@ -16,7 +16,7 @@ class MySpringProperties {
 	@Autowired
 	private MySpringBean mySpringBean;
 
-	@Property
+	@Property(tries = 10)
 	void nameIsAddedToHello(@ForAll @AlphaChars @StringLength(min = 1) String name) {
 		String greeting = mySpringBean.sayHello(name);
 		Assertions.assertTrue(greeting.contains(name));

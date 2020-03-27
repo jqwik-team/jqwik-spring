@@ -17,13 +17,12 @@ import org.springframework.test.context.support.*;
 @API(status = API.Status.EXPERIMENTAL, since = "0.5.0")
 public class JqwikSpringExtension implements RegistrarHook {
 
-	public static Optional<TestContextManager> getTestContextManager(LifecycleContext context) {
-		return testContextManagerStore(context).map(store -> store.get());
+	public static TestContextManager getTestContextManager(Class<?> containerClass) {
+		return testContextManagerStore(containerClass).get();
 	}
 
-	private static Optional<Store<TestContextManager>> testContextManagerStore(LifecycleContext context) {
-		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
-		return optionalContainerClass.map(JqwikSpringExtension::getOrCreateTestContextManagerStore);
+	private static Store<TestContextManager> testContextManagerStore(Class<?> containerClass) {
+		return getOrCreateTestContextManagerStore(containerClass);
 	}
 
 	@Override
@@ -64,17 +63,17 @@ class AroundContainer implements BeforeContainerHook, AfterContainerHook {
 
 	@Override
 	public void beforeContainer(ContainerLifecycleContext context) throws Exception {
-		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
-		if (optionalTestContextManager.isPresent()) {
-			optionalTestContextManager.get().beforeTestClass();
+		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
+		if (optionalContainerClass.isPresent()) {
+			JqwikSpringExtension.getTestContextManager(optionalContainerClass.get()).beforeTestClass();
 		}
 	}
 
 	@Override
 	public void afterContainer(ContainerLifecycleContext context) throws Exception {
-		Optional<TestContextManager> optionalTestContextManager = JqwikSpringExtension.getTestContextManager(context);
-		if (optionalTestContextManager.isPresent()) {
-			optionalTestContextManager.get().afterTestClass();
+		Optional<Class<?>> optionalContainerClass = context.optionalContainerClass();
+		if (optionalContainerClass.isPresent()) {
+			JqwikSpringExtension.getTestContextManager(optionalContainerClass.get()).afterTestClass();
 		}
 	}
 
@@ -87,8 +86,6 @@ class AroundContainer implements BeforeContainerHook, AfterContainerHook {
 
 class OutsideHooks implements AroundTryHook {
 
-	private TestContextManager testContextManager;
-
 	@Override
 	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
 		// Only apply to methods
@@ -96,16 +93,14 @@ class OutsideHooks implements AroundTryHook {
 	}
 
 	@Override
-	public void prepareFor(LifecycleContext context) {
-		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
-	}
-
-	@Override
 	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
+		Class<?> containerClass = context.propertyContext().containerClass();
+		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
+
 		Object testInstance = context.propertyContext().testInstance();
-		prepareTestInstance(testInstance);
+		prepareTestInstance(testContextManager, testInstance);
 		Method testMethod = context.propertyContext().targetMethod();
-		beforeExecutionHooks(testInstance, testMethod);
+		beforeExecutionHooks(testContextManager, testInstance, testMethod);
 
 		Throwable testException = null;
 		try {
@@ -113,7 +108,7 @@ class OutsideHooks implements AroundTryHook {
 			testException = executionResult.throwable().orElse(null);
 			return executionResult;
 		} finally {
-			afterExecutionHooks(testInstance, testMethod, testException);
+			afterExecutionHooks(testContextManager, testInstance, testMethod, testException);
 		}
 	}
 
@@ -122,23 +117,30 @@ class OutsideHooks implements AroundTryHook {
 		return -20;
 	}
 
-	private void prepareTestInstance(Object testInstance) throws Exception {
+	private void prepareTestInstance(TestContextManager testContextManager, Object testInstance) throws Exception {
 		testContextManager.prepareTestInstance(testInstance);
 	}
 
-	private void beforeExecutionHooks(Object testInstance, Method testMethod) throws Exception {
+	private void beforeExecutionHooks(
+			TestContextManager testContextManager,
+			Object testInstance,
+			Method testMethod
+	) throws Exception {
 		testContextManager.beforeTestMethod(testInstance, testMethod);
 	}
 
-	private void afterExecutionHooks(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+	private void afterExecutionHooks(
+			TestContextManager testContextManager,
+			Object testInstance,
+			Method testMethod,
+			Throwable testException
+	) throws Exception {
 		testContextManager.afterTestMethod(testInstance, testMethod, testException);
 	}
 
 }
 
 class InsideHooks implements AroundTryHook {
-
-	private TestContextManager testContextManager;
 
 	@Override
 	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
@@ -147,16 +149,14 @@ class InsideHooks implements AroundTryHook {
 	}
 
 	@Override
-	public void prepareFor(LifecycleContext context) {
-		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
-	}
-
-	@Override
 	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
+		Class<?> containerClass = context.propertyContext().containerClass();
+		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
+
 		Object testInstance = context.propertyContext().testInstance();
 		Method testMethod = context.propertyContext().targetMethod();
 
-		beforeExecution(testInstance, testMethod);
+		beforeExecution(testContextManager, testInstance, testMethod);
 
 		Throwable testException = null;
 		try {
@@ -164,7 +164,7 @@ class InsideHooks implements AroundTryHook {
 			testException = executionResult.throwable().orElse(null);
 			return executionResult;
 		} finally {
-			afterExecution(testInstance, testMethod, testException);
+			afterExecution(testContextManager, testInstance, testMethod, testException);
 		}
 	}
 
@@ -173,31 +173,26 @@ class InsideHooks implements AroundTryHook {
 		return 100;
 	}
 
-	private void beforeExecution(Object testInstance, Method testMethod) throws Exception {
+	private void beforeExecution(TestContextManager testContextManager, Object testInstance, Method testMethod) throws Exception {
 		testContextManager.beforeTestExecution(testInstance, testMethod);
 	}
 
-	public void afterExecution(Object testInstance, Method testMethod, Throwable testException) throws Exception {
+	public void afterExecution(TestContextManager testContextManager, Object testInstance, Method testMethod, Throwable testException) throws Exception {
 		testContextManager.afterTestExecution(testInstance, testMethod, testException);
 	}
 }
 
 class ResolveSpringParameters implements ResolveParameterHook {
 
-	private TestContextManager testContextManager;
-
-	@Override
-	public void prepareFor(LifecycleContext context) {
-		JqwikSpringExtension.getTestContextManager(context).ifPresent(testContextManager -> this.testContextManager = testContextManager);
-	}
-
 	@Override
 	public Optional<ParameterSupplier> resolve(ParameterResolutionContext parameterContext) {
 
 		Parameter parameter = parameterContext.parameter();
+		Class<?> containerClass = parameterContext.parameter().getDeclaringExecutable().getDeclaringClass();
+		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 
 		if (canParameterBeResolved(parameterContext.index(), parameter)) {
-			return Optional.of(new SpringSupplier(parameterContext));
+			return Optional.of(new SpringSupplier(parameterContext, testContextManager));
 		}
 
 		return Optional.empty();
@@ -211,20 +206,21 @@ class ResolveSpringParameters implements ResolveParameterHook {
 
 	private boolean isAutowirableConstructor(Parameter parameter) {
 		Executable executable = parameter.getDeclaringExecutable();
-
-		// TODO: This should be the testContainerClass
-		//       which might be different in case of inheritance
 		Class<?> testClass = executable.getDeclaringClass();
-
 		return TestConstructorUtils.isAutowirableConstructor(executable, testClass);
 	}
 
-	private class SpringSupplier implements ResolveParameterHook.ParameterSupplier {
+	private static class SpringSupplier implements ResolveParameterHook.ParameterSupplier {
 
 		private ParameterResolutionContext parameterContext;
+		private TestContextManager testContextManager;
 
-		public SpringSupplier(ParameterResolutionContext parameterContext) {
+		public SpringSupplier(
+				ParameterResolutionContext parameterContext,
+				TestContextManager testContextManager
+		) {
 			this.parameterContext = parameterContext;
+			this.testContextManager = testContextManager;
 		}
 
 		@Override

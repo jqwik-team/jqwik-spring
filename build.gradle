@@ -13,7 +13,7 @@ ext {
 	junitJupiterVersion = '5.6.1'
 	assertJVersion = '3.15.0'
 	mockitoVersion = '3.3.3'
-	jqwikVersion = '1.2.5'
+	jqwikVersion = '1.2.6-SNAPSHOT'
 	jqwikSpringVersion = '0.5.0-SNAPSHOT'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
