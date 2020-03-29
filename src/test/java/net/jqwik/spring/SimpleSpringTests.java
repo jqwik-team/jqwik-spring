@@ -5,6 +5,7 @@ import java.util.*;
 import net.jqwik.api.*;
 import net.jqwik.api.lifecycle.*;
 import org.assertj.core.api.*;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.*;
 
@@ -19,6 +20,9 @@ class SimpleSpringTests {
 
 	@Autowired
 	MyBean myBean;
+
+	@Mock
+	List<String> mockList;
 
 	@BeforeContainer
 	static void beforeContainer(@Autowired MyBean myBean, @Autowired @Qualifier("TestName") String testName) {
@@ -64,6 +68,12 @@ class SimpleSpringTests {
 	@Property(tries = 5)
 	void accessInjectedBean(@Autowired MyBean injected) {
 		Assertions.assertThat(injected.sayHello()).isEqualTo("hello");
+	}
+
+	@Property(tries = 5)
+	void mocksAreInitializedPerTry() {
+		Assertions.assertThat(mockList).hasSize(0);
+		Mockito.when(mockList.size()).thenReturn(42);
 	}
 
 	@Property(tries = 5)

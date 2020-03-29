@@ -74,9 +74,10 @@ Please report any compatibility issues you stumble upon.
 
 ### Supported JUnit Platform Versions
 
-You need at least version `1.6.0` of the JUnit platform.
-Keep in mind that if you are using Spring Boot you will have to explicitly
-set the JUnit platform version.
+You need at least version `1.6.1` of the JUnit platform - otherwise 
+strange things _could_ happen.
+Keep in mind that if you are using Spring Boot you will have to 
+[explicitly set the JUnit platform version](https://stackoverflow.com/a/54605523/32352).
 
 ## Standard Usage
 
@@ -110,7 +111,7 @@ class MySpringProperties {
 Configuration and autowiring of values is delegated to Spring's own test framework. Therefore all 
 [integration testing annotations](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-spring)
 can be used. This is also true for 
-[standard annotation support](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-standard)
+[standard annotation support](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-standard).
 
 ### Lifecycle
 
