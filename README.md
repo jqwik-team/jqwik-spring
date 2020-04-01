@@ -35,6 +35,10 @@ dependencies {
 }
 ```
 
+You can look at a 
+[sample project](https://github.com/jlink/jqwik-samples/tree/master/jqwik-spring-boot-gradle)
+ using jqwik, Spring Boot and Gradle.
+
 ### Maven
 
 Follow the 
