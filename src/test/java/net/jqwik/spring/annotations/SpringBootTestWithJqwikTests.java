@@ -1,7 +1,7 @@
 package net.jqwik.spring.annotations;
 
 import net.jqwik.api.*;
-import net.jqwik.spring.boot.*;
+import net.jqwik.spring.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.autoconfigure.web.servlet.*;
 import org.springframework.boot.test.context.*;
@@ -11,12 +11,13 @@ import org.springframework.test.web.servlet.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@JqwikSpringBootTest(
+@JqwikSpringSupport
+@SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
 		classes = TestableSpringBootApplication.class
 )
 @AutoConfigureMockMvc
-class JqwikSpringBootTestTests {
+class SpringBootTestWithJqwikTests {
 
 	@Autowired
 	private MockMvc mvc;

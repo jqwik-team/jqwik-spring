@@ -28,10 +28,10 @@ and add the following dependency to your `build.gradle` file:
 
 ```
 dependencies {
-    implementation("org.springframework:spring-context:5.2.4.RELEASE")
+    implementation("org.springframework:spring-context:5.2.5.RELEASE")
     ...
-    testImplementation("net.jqwik:jqwik-spring:0.5.0")
-    testImplementation("org.springframework:spring-test:5.2.4.RELEASE")
+    testImplementation("net.jqwik:jqwik-spring:0.6.0")
+    testImplementation("org.springframework:spring-test:5.2.5.RELEASE")
 }
 ```
 
@@ -45,19 +45,19 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-context</artifactId>
-  <version>5.2.4.RELEASE</version>
+  <version>5.2.5.RELEASE</version>
 </dependency>
 ...
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.5.0</version>
+  <version>0.6.0</version>
   <scope>test</scope>
 </dependency>
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-test</artifactId>
-  <version>5.2.4.RELEASE</version>
+  <version>5.2.5.RELEASE</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -69,6 +69,7 @@ Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 
 - `5.2.0-RELEASE`
 - `5.2.4-RELEASE`
+- `5.2.5-RELEASE`
 
 Please report any compatibility issues you stumble upon.
 
@@ -82,7 +83,7 @@ Keep in mind that if you are using Spring Boot you will have to
 ## Standard Usage
 
 To enable autowiring of a Spring application context or beans you just have to
-add `@AddLifecycleHook(JqwikSpringExtension.class)` to your test container class:
+add `@JqwikSpringSupport` to your test container class:
 
 ```java
 import net.jqwik.api.*;
@@ -93,7 +94,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.*;
 
-@AddLifecycleHook(JqwikSpringExtension.class)
+@JqwikSpringSupport
 @ContextConfiguration(classes = MySpringConfig.class)
 class MySpringProperties {
 
@@ -127,7 +128,7 @@ the property method with
 Compare the following two properties:
 
 ```java
-@AddLifecycleHook(JqwikSpringExtension.class)
+@JqwikSpringSupport
 @ContextConfiguration(classes = MySpringConfig.class)
 class MySpringProperties {
 
@@ -156,7 +157,7 @@ in all
 and also in the test container class's constructor - if there is only one:
 
 ```java
-@AddLifecycleHook(JqwikSpringExtension.class)
+@JqwikSpringSupport
 @ContextConfiguration(classes = MySpringConfig.class)
 class MyOtherSpringProperties {
     @Autowired
@@ -176,19 +177,6 @@ class MyOtherSpringProperties {
 }
 ```
 
-### Annotations
-
-There are two dedicated annotations to simplify set up of jqwik test container
-classes with Spring:
-
-- `@SpringJqwikConfig`: Works just like
-  [`@SpringJunitConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitconfig),
-  but for jqwik properties.
-
-- `@SpringJqwikWebConfig`: Works just like
-  [`@SpringJunitWebConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitwebconfig),
-  but for jqwik properties.
-
 ### Spring JUnit Jupiter Testing Annotations
 
 _jqwik_'s Spring support is trying to mostly simulate how Spring's native
@@ -198,11 +186,11 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
 
 - [`@TestConstructor`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-testconstructor)
 
-#### Unsupported Jupiter Test Annotations
-
-- [`@SpringJunitConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitconfig): Replace with `@net.jqwik.spring.SpringJqwikConfig`
+- [`@SpringJunitConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitconfig)
  
-- [`@SpringJunitWebConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitwebconfig): Replace with `@net.jqwik.spring.SpringJqwikWebConfig` 
+- [`@SpringJunitWebConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitwebconfig)
+
+#### Unsupported Jupiter Test Annotations 
 
 - `@EnabledIf`: Planned for future versions
 
@@ -210,8 +198,15 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
 
 ## Spring Boot
 
-The current version has no dedicated support for Spring Boot but the usual stuff
-works out of the box.
+By using `@JqwikSpringSupport` as described above most - if not all - Spring Boot
+testing features, e.g. [test auto-configuration annotations](https://docs.spring.io/spring-boot/docs/2.2.6.RELEASE/reference/html/appendix-test-auto-configuration.html#test-auto-configuration) should work.
+
+This was tested with the following Spring Boot versions:
+
+- `2.2.0.RELEASE`
+- `2.2.5.RELEASE`
+- `2.2.6.RELEASE`
+
 
 ## Shortcomings
 

@@ -3,12 +3,14 @@ package net.jqwik.spring.annotations;
 import net.jqwik.api.*;
 import net.jqwik.spring.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.test.context.junit.jupiter.web.*;
 import org.springframework.web.context.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringJqwikWebConfig(TestConfig.class)
-class SpringJqwikWebConfigTests {
+@JqwikSpringSupport
+@SpringJUnitWebConfig(TestConfig.class)
+class SpringJUnitWebConfigWithJqwikTests {
 
 	@Autowired
 	MyBean myBean;

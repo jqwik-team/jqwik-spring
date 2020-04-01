@@ -9,7 +9,7 @@ import org.mockito.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.*;
 
-@AddLifecycleHook(JqwikSpringExtension.class)
+@JqwikSpringSupport
 @ContextConfiguration(classes = TestConfig.class)
 class SimpleSpringTests {
 

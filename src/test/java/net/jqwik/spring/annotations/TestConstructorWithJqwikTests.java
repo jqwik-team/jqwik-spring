@@ -2,17 +2,17 @@ package net.jqwik.spring.annotations;
 
 import net.jqwik.api.*;
 import net.jqwik.spring.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.context.*;
 import org.springframework.test.context.*;
+import org.springframework.test.context.junit.jupiter.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@SpringJqwikConfig(TestConfig.class)
+@JqwikSpringSupport
+@SpringJUnitConfig(TestConfig.class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class TestConstructorTests {
+class TestConstructorWithJqwikTests {
 
-	TestConstructorTests(MyBean myBean) {
+	TestConstructorWithJqwikTests(MyBean myBean) {
 		this.myBean = myBean;
 	}
 
