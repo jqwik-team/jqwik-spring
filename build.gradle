@@ -1,3 +1,9 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+	id 'signing'
+}
+
 static isSnapshotRelease(versionString) {
 	versionString.endsWith('SNAPSHOT')
 }
@@ -12,22 +18,17 @@ ext {
 	assertJVersion = '3.15.0'
 	mockitoVersion = '3.3.3'
 	jqwikVersion = '1.2.6'
-	jqwikSpringVersion = '0.6.0-SNAPSHOT'
+	jqwikSpringVersion = '0.6.0'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
 repositories {
 	mavenCentral()
-//	maven { url 'https://repo.spring.io/plugins-release' }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 group = moduleName
 version = jqwikSpringVersion
-
-apply plugin: 'java-library'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
 
 java {
 	withJavadocJar()
