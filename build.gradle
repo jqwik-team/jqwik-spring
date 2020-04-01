@@ -7,18 +7,18 @@ ext {
 	junitPlatformVersion = '1.6.1'
 	opentest4jVersion = '1.2.0'
 	junitJupiterVersion = '5.6.1'
-	springVersion = '5.2.4.RELEASE'
-	springBootVersion = '2.2.5.RELEASE'
+	springVersion = '5.2.5.RELEASE'
+	springBootVersion = '2.2.6.RELEASE'
 	assertJVersion = '3.15.0'
 	mockitoVersion = '3.3.3'
 	jqwikVersion = '1.2.6'
-	jqwikSpringVersion = '0.5.0'
+	jqwikSpringVersion = '0.6.0-SNAPSHOT'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
 repositories {
 	mavenCentral()
-	maven { url 'https://repo.spring.io/plugins-release' }
+//	maven { url 'https://repo.spring.io/plugins-release' }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
@@ -62,6 +62,7 @@ dependencies {
 
 	compileOnly("org.springframework:spring-test:${springVersion}")
 	compileOnly("org.springframework:spring-context:${springVersion}")
+	compileOnly("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
 
 	testImplementation("org.assertj:assertj-core:${assertJVersion}")
 
