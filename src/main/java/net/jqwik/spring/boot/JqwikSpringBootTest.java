@@ -27,55 +27,23 @@ import org.springframework.test.context.*;
 @Documented
 @Inherited
 @BootstrapWith(SpringBootTestContextBootstrapper.class)
+@SpringBootTest
 @AddLifecycleHook(JqwikSpringExtension.class)
 public @interface JqwikSpringBootTest {
 
-	/**
-	 * Alias for {@link #properties()}.
-	 *
-	 * @return the properties to apply
-	 */
-	@AliasFor("properties")
+	@AliasFor(annotation = SpringBootTest.class, attribute = "value")
 	String[] value() default {};
 
-	/**
-	 * Properties in form {@literal key=value} that should be added to the Spring
-	 * {@link Environment} before the test runs.
-	 *
-	 * @return the properties to add
-	 */
-	@AliasFor("value")
+	@AliasFor(annotation = SpringBootTest.class, attribute = "properties")
 	String[] properties() default {};
 
-	/**
-	 * Application arguments that should be passed to the application under test.
-	 *
-	 * @return the application arguments to pass to the application under test.
-	 * @see ApplicationArguments
-	 * @see SpringApplication#run(String...)
-	 */
+	@AliasFor(annotation = SpringBootTest.class, attribute = "args")
 	String[] args() default {};
 
-	/**
-	 * The <em>component classes</em> to use for loading an
-	 * {@link org.springframework.context.ApplicationContext ApplicationContext}. Can also
-	 * be specified using
-	 * {@link ContextConfiguration#classes() @ContextConfiguration(classes=...)}. If no
-	 * explicit classes are defined the test will look for nested
-	 * {@link Configuration @Configuration} classes, before falling back to a
-	 * {@link SpringBootConfiguration @SpringBootConfiguration} search.
-	 *
-	 * @return the component classes used to load the application context
-	 * @see ContextConfiguration#classes()
-	 */
+	@AliasFor(annotation = SpringBootTest.class, attribute = "classes")
 	Class<?>[] classes() default {};
 
-	/**
-	 * The type of web environment to create when applicable. Defaults to
-	 * {@link WebEnvironment#MOCK}.
-	 *
-	 * @return the type of web environment
-	 */
+	@AliasFor(annotation = SpringBootTest.class, attribute = "webEnvironment")
 	WebEnvironment webEnvironment() default WebEnvironment.MOCK;
 
 }
