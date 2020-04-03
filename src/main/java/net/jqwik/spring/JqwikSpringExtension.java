@@ -94,12 +94,12 @@ class OutsideHooks implements AroundTryHook {
 
 	@Override
 	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
-		Class<?> containerClass = context.propertyContext().containerClass();
+		Class<?> containerClass = context.containerClass();
 		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 
-		Object testInstance = context.propertyContext().testInstance();
+		Object testInstance = context.testInstance();
 		prepareTestInstance(testContextManager, testInstance);
-		Method testMethod = context.propertyContext().targetMethod();
+		Method testMethod = context.targetMethod();
 		beforeExecutionHooks(testContextManager, testInstance, testMethod);
 
 		Throwable testException = null;
@@ -150,11 +150,11 @@ class InsideHooks implements AroundTryHook {
 
 	@Override
 	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
-		Class<?> containerClass = context.propertyContext().containerClass();
+		Class<?> containerClass = context.containerClass();
 		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 
-		Object testInstance = context.propertyContext().testInstance();
-		Method testMethod = context.propertyContext().targetMethod();
+		Object testInstance = context.testInstance();
+		Method testMethod = context.targetMethod();
 
 		beforeExecution(testContextManager, testInstance, testMethod);
 
@@ -177,7 +177,12 @@ class InsideHooks implements AroundTryHook {
 		testContextManager.beforeTestExecution(testInstance, testMethod);
 	}
 
-	public void afterExecution(TestContextManager testContextManager, Object testInstance, Method testMethod, Throwable testException) throws Exception {
+	public void afterExecution(
+			TestContextManager testContextManager,
+			Object testInstance,
+			Method testMethod,
+			Throwable testException
+	) throws Exception {
 		testContextManager.afterTestExecution(testInstance, testMethod, testException);
 	}
 }
