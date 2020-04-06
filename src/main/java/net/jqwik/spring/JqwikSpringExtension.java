@@ -2,13 +2,17 @@ package net.jqwik.spring;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.*;
 
 import net.jqwik.api.*;
 import net.jqwik.api.lifecycle.*;
 import org.apiguardian.api.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.*;
 import org.springframework.test.context.*;
+import org.springframework.test.context.junit.jupiter.*;
 import org.springframework.test.context.support.*;
 
 /**
@@ -46,9 +50,10 @@ class JqwikSpringExtension implements RegistrarHook {
 	@Override
 	public void registerHooks(Registrar registrar) {
 		registrar.register(AroundContainer.class, PropagationMode.NO_DESCENDANTS);
-		registrar.register(OutsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
-		registrar.register(InsideHooks.class, PropagationMode.DIRECT_DESCENDANTS);
+		registrar.register(OutsideHook.class, PropagationMode.DIRECT_DESCENDANTS);
+		registrar.register(InsideHook.class, PropagationMode.DIRECT_DESCENDANTS);
 		registrar.register(ResolveSpringParameters.class, PropagationMode.DIRECT_DESCENDANTS);
+		registrar.register(EnabledIfHook.class, PropagationMode.DIRECT_DESCENDANTS);
 	}
 
 }
@@ -84,7 +89,7 @@ class AroundContainer implements BeforeContainerHook, AfterContainerHook {
 
 }
 
-class OutsideHooks implements AroundTryHook {
+class OutsideHook implements AroundTryHook {
 
 	@Override
 	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
@@ -140,7 +145,7 @@ class OutsideHooks implements AroundTryHook {
 
 }
 
-class InsideHooks implements AroundTryHook {
+class InsideHook implements AroundTryHook {
 
 	@Override
 	public boolean appliesTo(Optional<AnnotatedElement> optionalElement) {
@@ -250,6 +255,175 @@ class ResolveSpringParameters implements ResolveParameterHook {
 				);
 				return new JqwikException(message);
 			});
+		}
+	}
+}
+
+class EnabledIfHook implements SkipExecutionHook {
+
+	@Override
+	public SkipResult shouldBeSkipped(LifecycleContext context) {
+		if (!context.findAnnotation(EnabledIf.class).isPresent()) {
+			return SkipResult.doNotSkip();
+		}
+		ExtensionContext extensionContext = new ExtensionContextAdapter(context);
+		ConditionEvaluationResult evaluationResult = new EnabledIfCondition().evaluateExecutionCondition(extensionContext);
+		if (evaluationResult.isDisabled()) {
+			return SkipResult.skip(evaluationResult.getReason().orElse(null));
+		}
+		return SkipResult.doNotSkip();
+	}
+
+	private static class ExtensionContextAdapter implements ExtensionContext {
+
+		private LifecycleContext context;
+
+		private ExtensionContextAdapter(LifecycleContext context) {
+			this.context = context;
+		}
+
+		@Override
+		public Optional<ExtensionContext> getParent() {
+			return Optional.empty();
+		}
+
+		@Override
+		public ExtensionContext getRoot() {
+			// Used in expression evaluation to get store
+			return this;
+		}
+
+		@Override
+		public String getUniqueId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getDisplayName() {
+			return context.label();
+		}
+
+		@Override
+		public Set<String> getTags() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Optional<AnnotatedElement> getElement() {
+			if (context instanceof PropertyLifecycleContext) {
+				return Optional.of(((PropertyLifecycleContext) context).targetMethod());
+			}
+			if (context instanceof TryLifecycleContext) {
+				return Optional.of(((TryLifecycleContext) context).targetMethod());
+			}
+			return context.optionalElement();
+		}
+
+		@Override
+		public Optional<Class<?>> getTestClass() {
+			return context.optionalContainerClass();
+		}
+
+		@Override
+		public Optional<TestInstance.Lifecycle> getTestInstanceLifecycle() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<Object> getTestInstance() {
+			if (context instanceof PropertyLifecycleContext) {
+				return Optional.of(((PropertyLifecycleContext) context).testInstance());
+			}
+			if (context instanceof TryLifecycleContext) {
+				return Optional.of(((TryLifecycleContext) context).testInstance());
+			}
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<TestInstances> getTestInstances() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Optional<Method> getTestMethod() {
+			if (context instanceof PropertyLifecycleContext) {
+				return Optional.of(((PropertyLifecycleContext) context).targetMethod());
+			}
+			if (context instanceof TryLifecycleContext) {
+				return Optional.of(((TryLifecycleContext) context).targetMethod());
+			}
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<Throwable> getExecutionException() {
+			return Optional.empty();
+		}
+
+		@Override
+		public Optional<String> getConfigurationParameter(String key) {
+			return Optional.empty();
+		}
+
+		@Override
+		public void publishReportEntry(Map<String, String> map) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Store getStore(Namespace namespace) {
+			return new StoreAdapter(context);
+		}
+	}
+
+	private static class StoreAdapter implements org.junit.jupiter.api.extension.ExtensionContext.Store {
+
+		private LifecycleContext context;
+
+		public StoreAdapter(LifecycleContext context) {
+			this.context = context;
+		}
+
+		@Override
+		public Object get(Object key) {
+			return JqwikSpringExtension.getTestContextManager(context.optionalContainerClass().orElseThrow(
+					() -> new JqwikException("No test context manager registered")
+			));
+		}
+
+		@Override
+		public <V> V get(Object key, Class<V> requiredType) {
+			if (requiredType.equals(TestContextManager.class)) {
+				return (V) get(key);
+			} else {
+				return null;
+			}
+		}
+
+		@Override
+		public <K, V> Object getOrComputeIfAbsent(K key, Function<K, V> defaultCreator) {
+			return get(key);
+		}
+
+		@Override
+		public <K, V> V getOrComputeIfAbsent(K key, Function<K, V> defaultCreator, Class<V> requiredType) {
+			return get(key, requiredType);
+		}
+
+		@Override
+		public void put(Object key, Object value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object remove(Object key) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public <V> V remove(Object key, Class<V> requiredType) {
+			throw new UnsupportedOperationException();
 		}
 	}
 }

@@ -18,7 +18,7 @@ ext {
 	assertJVersion = '3.15.0'
 	mockitoVersion = '3.3.3'
 	jqwikVersion = '1.2.7-SNAPSHOT'
-	jqwikSpringVersion = '0.6.1-SNAPSHOT'
+	jqwikSpringVersion = '0.7.0-SNAPSHOT'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
@@ -63,7 +63,7 @@ dependencies {
 
 	compileOnly("org.springframework:spring-test:${springVersion}")
 	compileOnly("org.springframework:spring-context:${springVersion}")
-	compileOnly("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+	compileOnly("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
 
 	testImplementation("org.assertj:assertj-core:${assertJVersion}")
 
