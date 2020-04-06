@@ -10,9 +10,9 @@ import org.springframework.test.context.*;
 import org.springframework.test.context.junit.jupiter.*;
 
 @JqwikSpringSupport
-@TestPropertySource(properties = {"mytest.enabled = true"})
+@TestPropertySource(properties = {"mytest.disabled = true"})
 @ContextConfiguration(classes = TestConfig.class)
-class EnabledIfWithJqwikTests {
+class DisabledIfWithJqwikTests {
 
 	private static final List<String> run = new ArrayList<>();
 
@@ -20,44 +20,44 @@ class EnabledIfWithJqwikTests {
 	static void checkRunMethods() {
 		Assertions.assertThat(run).containsExactlyInAnyOrder(
 				"shouldBeEnabled",
-				"shouldBeEnabledByPropertyValue",
 				"shouldBeEnabledBySpringEL"
 		);
 	}
 
 	@Example
-	@EnabledIf(expression = "true")
+	@DisabledIf(
+			expression = "false"
+	)
 	void shouldBeEnabled() {
 		run.add("shouldBeEnabled");
 	}
 
 	@Example
-	@EnabledIf(expression = "${mytest.enabled}", loadContext = true)
-	void shouldBeEnabledByPropertyValue() {
-		run.add("shouldBeEnabledByPropertyValue");
+	@DisabledIf(expression = "${mytest.disabled}", loadContext = true)
+	void shouldBeDisabledByPropertyValue() {
+		run.add("shouldBeDisabledByPropertyValue");
 	}
 
 	@Example
-	@EnabledIf("#{42 != 41}")
+	@DisabledIf("#{42 == 41}")
 	void shouldBeEnabledBySpringEL() {
 		run.add("shouldBeEnabledBySpringEL");
 	}
 
 	@Example
-	@EnabledIf(expression = "false")
+	@DisabledIf(expression = "true")
 	void shouldBeDisabled() {
 		run.add("shouldBeDisabled");
 	}
 
 	@JqwikSpringSupport
-	@EnabledIf("false")
+	@DisabledIf("true")
 	@ContextConfiguration(classes = TestConfig.class)
-	static class ShouldNotBeEnabledTests {
+	static class ShouldBeDisabledTests {
 
 		@Example
 		void shouldNotBeCalled() {
-			Assertions.fail("should be disabled by EnabledIf annotation on class");
+			Assertions.fail("should be disabled by DisabledIf annotation on class");
 		}
 	}
-
 }
