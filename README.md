@@ -30,7 +30,7 @@ and add the following dependency to your `build.gradle` file:
 dependencies {
     implementation("org.springframework:spring-context:5.2.5.RELEASE")
     ...
-    testImplementation("net.jqwik:jqwik-spring:0.6.0")
+    testImplementation("net.jqwik:jqwik-spring:0.7.0")
     testImplementation("org.springframework:spring-test:5.2.5.RELEASE")
 }
 ```
@@ -55,7 +55,7 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.6.0</version>
+  <version>0.7.0</version>
   <scope>test</scope>
 </dependency>
 <dependency>
@@ -79,7 +79,7 @@ Please report any compatibility issues you stumble upon.
 
 ### Supported JUnit Platform Versions
 
-You need at least version `1.6.1` of the JUnit platform - otherwise 
+You need at least version `1.6.2` of the JUnit platform - otherwise 
 strange things _could_ happen.
 Keep in mind that if you are using Spring Boot you will have to 
 [explicitly set the JUnit platform version](https://stackoverflow.com/a/54605523/32352).
@@ -194,11 +194,9 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
  
 - [`@SpringJunitWebConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitwebconfig)
 
-#### Unsupported Jupiter Test Annotations 
+- [`@EnabledIf`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-enabledif)
 
-- `@EnabledIf`: Planned for future versions
-
-- `@DisabledIf`: Planned for future versions
+- [`@DisabledIf`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-disabledif)
 
 ## Spring Boot
 
