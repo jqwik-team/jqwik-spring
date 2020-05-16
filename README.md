@@ -74,6 +74,7 @@ Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 - `5.2.0-RELEASE`
 - `5.2.4-RELEASE`
 - `5.2.5-RELEASE`
+- `5.2.6-RELEASE`
 
 Please report any compatibility issues you stumble upon.
 
@@ -208,6 +209,7 @@ This was tested with the following Spring Boot versions:
 - `2.2.0.RELEASE`
 - `2.2.5.RELEASE`
 - `2.2.6.RELEASE`
+- `2.3.0.RELEASE`
 
 
 ## Shortcomings
