@@ -7,14 +7,17 @@ This project provides an extension to support testing of Spring and Spring-Boot 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ### Table of Contents  
 
-- [Installation](#installation)
-- [Spring TestContext Framework](#spring-testcontext-framework)
+- [How to Install](#how-to-install)
+  - [Gradle](#gradle)
+  - [Maven](#maven)
+  - [Supported Spring Versions](#supported-spring-versions)
+  - [Supported JUnit Platform Versions](#supported-junit-platform-versions)
+- [Standard Usage](#standard-usage)
   - [Lifecycle](#lifecycle)
-  - [Annotations](#annotations)
-  - [Supported Spring Test Annotations](#supported-spring-test-annotations)
-  - [Unsupported Stuff](#unsupported-stuff)
+  - [Parameter Resolution of Autowired Beans](#parameter-resolution-of-autowired-beans)
+  - [Spring JUnit Jupiter Testing Annotations](#spring-junit-jupiter-testing-annotations)
 - [Spring Boot](#spring-boot)
-- [Links](#links)
+- [Shortcomings](#shortcomings)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -217,8 +220,8 @@ This was tested with the following Spring Boot versions:
 The Spring extension and configuration is _NOT_ handed down to inner test groups.
 Also, member variables in the outer instance are not being auto wired
 even if the inner class has all necessary annotations.
-This is due to limitations of Spring's own testing framework and cannot be fixed
-by this library.
+This is due to [limitations of Spring's own testing framework](https://github.com/spring-projects/spring-framework/issues/19930) 
+and cannot be fixed by this library.
 
 
 
