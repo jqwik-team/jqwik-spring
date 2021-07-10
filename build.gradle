@@ -10,21 +10,19 @@ static isSnapshotRelease(versionString) {
 
 ext {
 	moduleName = 'net.jqwik.spring'
-	junitPlatformVersion = '1.6.2'
+	junitPlatformVersion = '1.7.2'
 	opentest4jVersion = '1.2.0'
-	junitJupiterVersion = '5.6.2'
-//	springVersion = '5.2.0.RELEASE'
-//	springVersion = '5.2.4.RELEASE'
-//	springVersion = '5.2.5.RELEASE'
-	springVersion = '5.2.6.RELEASE'
-//	springBootVersion = '2.2.0.RELEASE'
-//	springBootVersion = '2.2.5.RELEASE'
-//	springBootVersion = '2.2.6.RELEASE'
-	springBootVersion = '2.3.0.RELEASE'
-	assertJVersion = '3.15.0'
-	mockitoVersion = '3.3.3'
-	jqwikVersion = '1.2.7'
-	jqwikSpringVersion = '0.7.0'
+	junitJupiterVersion = '5.7.2'
+//	springVersion = '5.2.15.RELEASE'
+	springVersion = '5.3.8'
+//	springBootVersion = '2.2.13.RELEASE'
+//	springBootVersion = '2.3.12.RELEASE'
+//	springBootVersion = '2.4.8'
+	springBootVersion = '2.5.2'
+	assertJVersion = '3.19.0'
+	mockitoVersion = '3.11.2'
+	jqwikVersion = '1.5.3'
+	jqwikSpringVersion = '0.8.0'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
@@ -147,6 +145,5 @@ signing {
 }
 
 wrapper {
-	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '6.3'
+	gradleVersion = '7.1.1'
 }

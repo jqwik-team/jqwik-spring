@@ -58,7 +58,7 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.7.0</version>
+  <version>0.8.0</version>
   <scope>test</scope>
 </dependency>
 <dependency>
@@ -74,16 +74,14 @@ and add the following dependency to your `pom.xml` file:
 You have to provide your own version of Spring or Spring Boot through
 Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 
-- `5.2.0-RELEASE`
-- `5.2.4-RELEASE`
-- `5.2.5-RELEASE`
-- `5.2.6-RELEASE`
+- `5.2.15-RELEASE`
+- `5.3.8`
 
 Please report any compatibility issues you stumble upon.
 
 ### Supported JUnit Platform Versions
 
-You need at least version `1.6.2` of the JUnit platform - otherwise 
+You need at least version `1.7.2` of the JUnit platform - otherwise 
 strange things _could_ happen.
 Keep in mind that if you are using Spring Boot you will have to 
 [explicitly set the JUnit platform version](https://stackoverflow.com/a/54605523/32352).
@@ -209,13 +207,17 @@ testing features, e.g. [test auto-configuration annotations](https://docs.spring
 
 This was tested with the following Spring Boot versions:
 
-- `2.2.0.RELEASE`
-- `2.2.5.RELEASE`
-- `2.2.6.RELEASE`
-- `2.3.0.RELEASE`
+- `2.2.13.RELEASE`
+- `2.3.12.RELEASE`
+- `2.4.8`
+- `2.5.2`
 
+Please report any issues you have with other versions.
 
 ## Shortcomings
+
+_The following paragraph is no longer true for Spring's testing framework sinve version 2.5.0, 
+but jqwik-spring has not yet been tested with nested test classes aka groups._
 
 The Spring extension and configuration is _NOT_ handed down to inner test groups.
 Also, member variables in the outer instance are not being auto wired

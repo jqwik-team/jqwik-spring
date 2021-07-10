@@ -2,10 +2,12 @@ package net.jqwik.spring;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.*;
 
-import net.jqwik.api.lifecycle.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
+
+import net.jqwik.api.lifecycle.*;
 
 class JupiterExtensionContextAdapter implements ExtensionContext {
 
@@ -96,6 +98,11 @@ class JupiterExtensionContextAdapter implements ExtensionContext {
 
 	@Override
 	public Optional<String> getConfigurationParameter(String key) {
+		return Optional.empty();
+	}
+
+	@Override
+	public <T> Optional<T> getConfigurationParameter(String key, Function<String, T> transformer) {
 		return Optional.empty();
 	}
 
