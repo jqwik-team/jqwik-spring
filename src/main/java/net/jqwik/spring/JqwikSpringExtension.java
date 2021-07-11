@@ -42,12 +42,12 @@ class JqwikSpringExtension implements RegistrarHook {
 
 	@Override
 	public void registerHooks(Registrar registrar) {
-		registrar.register(AroundSpringTestContainer.class, PropagationMode.NO_DESCENDANTS);
-		registrar.register(OutsideLifecycleMethodsHook.class, PropagationMode.DIRECT_DESCENDANTS);
-		registrar.register(InsideLifecycleMethodsHook.class, PropagationMode.DIRECT_DESCENDANTS);
-		registrar.register(ResolveSpringParametersHook.class, PropagationMode.DIRECT_DESCENDANTS);
-		registrar.register(EnabledIfHook.class, PropagationMode.DIRECT_DESCENDANTS);
-		registrar.register(DisabledIfHook.class, PropagationMode.DIRECT_DESCENDANTS);
+		registrar.register(AroundSpringTestContainer.class, PropagationMode.ALL_DESCENDANTS);
+		registrar.register(OutsideLifecycleMethodsHook.class, PropagationMode.ALL_DESCENDANTS);
+		registrar.register(InsideLifecycleMethodsHook.class, PropagationMode.ALL_DESCENDANTS);
+		registrar.register(ResolveSpringParametersHook.class, PropagationMode.ALL_DESCENDANTS);
+		registrar.register(EnabledIfHook.class, PropagationMode.ALL_DESCENDANTS);
+		registrar.register(DisabledIfHook.class, PropagationMode.ALL_DESCENDANTS);
 	}
 
 }

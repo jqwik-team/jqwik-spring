@@ -40,7 +40,7 @@ class OutsideLifecycleMethodsHook implements AroundTryHook {
 	}
 
 	private void prepareTestInstance(TestContextManager testContextManager, Object testInstance) throws Exception {
-		testContextManager.prepareTestInstance(testInstance);
+		JqwikSpringReflectionSupport.applyToInstances(testInstance, testContextManager::prepareTestInstance);
 	}
 
 	private void beforeExecutionHooks(
