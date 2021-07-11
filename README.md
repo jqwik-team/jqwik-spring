@@ -216,10 +216,10 @@ Please report any issues you have with other versions.
 
 ## Shortcomings
 
-_The following paragraph is no longer true for Spring's testing framework sinve version 2.5.0, 
-but jqwik-spring has not yet been tested with nested test classes aka groups._
+### Old Spring (Boot) Versions 
 
-The Spring extension and configuration is _NOT_ handed down to inner test groups.
+Up to Spring version `5.2.15.RELEASE`, which comes with Spring Boot `2.3.12.RELEASE`,
+the Spring extension and configuration is _NOT_ handed down to inner test groups.
 Also, member variables in the outer instance are not being auto wired
 even if the inner class has all necessary annotations.
 This is due to [limitations of Spring's own testing framework](https://github.com/spring-projects/spring-framework/issues/19930) 

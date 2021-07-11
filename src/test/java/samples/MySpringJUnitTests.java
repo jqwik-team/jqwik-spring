@@ -1,45 +1,42 @@
 package samples;
 
-import net.jqwik.api.*;
-import net.jqwik.api.constraints.*;
-import net.jqwik.spring.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.annotation.*;
 import org.springframework.test.context.*;
+import org.springframework.test.context.junit.jupiter.*;
 
-@JqwikSpringSupport
+import net.jqwik.api.*;
+import net.jqwik.api.constraints.*;
+import net.jqwik.spring.*;
+
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MySpringConfig.class)
-class MySpringProperties {
+class MySpringJUnitTests {
 
 	@Autowired
 	private MySpringBean mySpringBean;
 
-	@Property(tries = 10)
-	void nameIsAddedToHello(@ForAll @AlphaChars @StringLength(min = 1) String name) {
-		String greeting = mySpringBean.sayHello(name);
-		Assertions.assertTrue(greeting.contains(name));
-	}
-
+	@Test
 	@Property(tries = 10)
 	void counterIsCountingUp(@Autowired MyCounter counter) {
 		counter.inc();
 		System.out.println(counter.value());
 	}
 
-	@Property(tries = 10)
+	@Test
 	@DirtiesContext
 	void counterIsAlways1(@Autowired MyCounter counter) {
 		counter.inc();
 		System.out.println(counter.value());
 	}
 
-	@Group
+	@Nested
 	@NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.INHERIT)
-	class NestedProperties {
+	class NestedTests {
 
-		@Example
-		// This should work starting Spring Boot 2.4.0
+		@Test
 		void nestedExample(@Autowired MySpringBean injectedBean) {
 			String greeting = mySpringBean.sayHello("test");
 			Assertions.assertTrue(greeting.contains("test"));
