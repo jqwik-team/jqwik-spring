@@ -18,6 +18,10 @@ This project provides an extension to support testing of Spring and Spring-Boot 
   - [Spring JUnit Jupiter Testing Annotations](#spring-junit-jupiter-testing-annotations)
 - [Spring Boot](#spring-boot)
 - [Shortcomings](#shortcomings)
+  - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
+- [Release Notes](#release-notes)
+  - [0.8.1](#081)
+  - [0.8.0](#080)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -229,3 +233,14 @@ and cannot be fixed by this library.
 
 
 
+## Release Notes
+
+### 0.8.1
+
+- For Spring >= 5.3.0 test configuration is now "inherited" to
+  nested container classes annotated with `@Group`.
+  
+### 0.8.0
+
+- Upgrade to jqwik 1.5.3
+- Tested with more recent versions of Spring and Spring Boot
