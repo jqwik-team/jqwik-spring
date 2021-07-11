@@ -31,10 +31,10 @@ and add the following dependency to your `build.gradle` file:
 
 ```
 dependencies {
-    implementation("org.springframework:spring-context:5.2.5.RELEASE")
+    implementation("org.springframework:spring-context:5.3.8")
     ...
-    testImplementation("net.jqwik:jqwik-spring:0.7.0")
-    testImplementation("org.springframework:spring-test:5.2.5.RELEASE")
+    testImplementation("net.jqwik:jqwik-spring:0.8.1")
+    testImplementation("org.springframework:spring-test:5.3.8")
 }
 ```
 
@@ -52,19 +52,19 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-context</artifactId>
-  <version>5.2.5.RELEASE</version>
+  <version>5.3.8</version>
 </dependency>
 ...
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.8.0</version>
+  <version>0.8.1</version>
   <scope>test</scope>
 </dependency>
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-test</artifactId>
-  <version>5.2.5.RELEASE</version>
+  <version>5.3.8</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -190,20 +190,22 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
 
 #### Supported Jupiter Test Annotations
 
-- [`@TestConstructor`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-testconstructor)
+- [`@TestConstructor`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-testconstructor)
 
-- [`@SpringJunitConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitconfig)
+- [`@SpringJunitConfig`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-junit-jupiter-springjunitconfig)
  
-- [`@SpringJunitWebConfig`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-springjunitwebconfig)
+- [`@SpringJunitWebConfig`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-junit-jupiter-springjunitwebconfig)
 
-- [`@EnabledIf`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-enabledif)
+- [`@EnabledIf`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-junit-jupiter-enabledif)
 
-- [`@DisabledIf`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html#integration-testing-annotations-junit-jupiter-disabledif)
+- [`@DisabledIf`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-junit-jupiter-disabledif)
+
+- [`@NestedTestConfiguration`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-nestedtestconfiguration)
 
 ## Spring Boot
 
 By using `@JqwikSpringSupport` as described above most - if not all - Spring Boot
-testing features, e.g. [test auto-configuration annotations](https://docs.spring.io/spring-boot/docs/2.2.6.RELEASE/reference/html/appendix-test-auto-configuration.html#test-auto-configuration) should work.
+testing features, e.g. [test auto-configuration annotations](https://docs.spring.io/spring-boot/docs/current/reference/html/test-auto-configuration.html#test-auto-configuration) should work.
 
 This was tested with the following Spring Boot versions:
 
@@ -216,7 +218,7 @@ Please report any issues you have with other versions.
 
 ## Shortcomings
 
-### Old Spring (Boot) Versions 
+### Nested/Grouped Tests in Old Spring (Boot) Versions 
 
 Up to Spring version `5.2.15.RELEASE`, which comes with Spring Boot `2.3.12.RELEASE`,
 the Spring extension and configuration is _NOT_ handed down to inner test groups.

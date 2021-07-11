@@ -17,10 +17,11 @@ class OutsideLifecycleMethodsHook implements AroundTryHook {
 	@Override
 	public TryExecutionResult aroundTry(TryLifecycleContext context, TryExecutor aTry, List<Object> parameters) throws Exception {
 		Class<?> containerClass = context.containerClass();
-		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 
 		Object testInstance = context.testInstance();
-		prepareTestInstance(testContextManager, testInstance);
+		prepareTestInstance(testInstance);
+
+		TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 		Method testMethod = context.targetMethod();
 		beforeExecutionHooks(testContextManager, testInstance, testMethod);
 
@@ -39,8 +40,11 @@ class OutsideLifecycleMethodsHook implements AroundTryHook {
 		return -20;
 	}
 
-	private void prepareTestInstance(TestContextManager testContextManager, Object testInstance) throws Exception {
-		JqwikSpringReflectionSupport.applyToInstances(testInstance, testContextManager::prepareTestInstance);
+	private void prepareTestInstance(Object testInstance) throws Exception {
+		JqwikSpringReflectionSupport.applyToInstances(testInstance, instance -> {
+			TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(instance.getClass());
+			testContextManager.prepareTestInstance(instance);
+		});
 	}
 
 	private void beforeExecutionHooks(
