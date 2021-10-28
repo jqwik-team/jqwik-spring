@@ -6,12 +6,13 @@ import java.util.function.*;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.parallel.*;
 
 import net.jqwik.api.lifecycle.*;
 
 class JupiterExtensionContextAdapter implements ExtensionContext {
 
-	private LifecycleContext context;
+	private final LifecycleContext context;
 
 	JupiterExtensionContextAdapter(LifecycleContext context) {
 		this.context = context;
@@ -114,5 +115,10 @@ class JupiterExtensionContextAdapter implements ExtensionContext {
 	@Override
 	public Store getStore(Namespace namespace) {
 		return new JupiterStoreAdapter(context);
+	}
+
+	@Override
+	public ExecutionMode getExecutionMode() {
+		return ExecutionMode.SAME_THREAD;
 	}
 }
