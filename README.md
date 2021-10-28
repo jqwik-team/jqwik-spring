@@ -37,7 +37,7 @@ and add the following dependency to your `build.gradle` file:
 dependencies {
     implementation("org.springframework:spring-context:5.3.8")
     ...
-    testImplementation("net.jqwik:jqwik-spring:0.8.1")
+    testImplementation("net.jqwik:jqwik-spring:0.8.2")
     testImplementation("org.springframework:spring-test:5.3.8")
 }
 ```
@@ -62,7 +62,7 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.8.1</version>
+  <version>0.8.2</version>
   <scope>test</scope>
 </dependency>
 <dependency>
@@ -85,7 +85,7 @@ Please report any compatibility issues you stumble upon.
 
 ### Supported JUnit Platform Versions
 
-You need at least version `1.7.2` of the JUnit platform - otherwise 
+You need at least version `1.8.1` of the JUnit platform - otherwise 
 strange things _could_ happen.
 Keep in mind that if you are using Spring Boot you will have to 
 [explicitly set the JUnit platform version](https://stackoverflow.com/a/54605523/32352).
@@ -216,7 +216,7 @@ This was tested with the following Spring Boot versions:
 - `2.2.13.RELEASE`
 - `2.3.12.RELEASE`
 - `2.4.8`
-- `2.5.2`
+- `2.5.4`
 
 Please report any issues you have with other versions.
 
@@ -234,6 +234,13 @@ and cannot be fixed by this library.
 
 
 ## Release Notes
+
+### 0.8.2
+
+- Upgrade jqwik 1.5.6
+- Upgrade to JUnitPlatform 5.8.1
+- Tested with Spring 5.3.11
+- Tested with Spring Boot 2.5.5
 
 ### 0.8.1
 
