@@ -79,7 +79,7 @@ You have to provide your own version of Spring or Spring Boot through
 Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 
 - `5.2.15-RELEASE`
-- `5.3.8`
+- `5.3.11`
 
 Please report any compatibility issues you stumble upon.
 
