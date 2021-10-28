@@ -56,7 +56,7 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-context</artifactId>
-  <version>5.3.8</version>
+  <version>5.3.11</version>
 </dependency>
 ...
 <dependency>
@@ -68,7 +68,7 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-test</artifactId>
-  <version>5.3.8</version>
+  <version>5.3.11</version>
   <scope>test</scope>
 </dependency>
 ```
