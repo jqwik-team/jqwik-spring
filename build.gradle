@@ -22,7 +22,7 @@ ext {
 	assertJVersion = '3.21.0'
 	mockitoVersion = '4.0.0'
 	jqwikVersion = '1.5.6'
-	jqwikSpringVersion = '0.8.2-SNAPSHOT'
+	jqwikSpringVersion = '0.8.3-SNAPSHOT'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
