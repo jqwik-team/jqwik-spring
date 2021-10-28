@@ -35,10 +35,10 @@ and add the following dependency to your `build.gradle` file:
 
 ```
 dependencies {
-    implementation("org.springframework:spring-context:5.3.8")
+    implementation("org.springframework:spring-context:5.3.11")
     ...
     testImplementation("net.jqwik:jqwik-spring:0.8.2")
-    testImplementation("org.springframework:spring-test:5.3.8")
+    testImplementation("org.springframework:spring-test:5.3.11")
 }
 ```
 
