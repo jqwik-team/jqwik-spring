@@ -101,8 +101,8 @@ publishing {
 			}
 
 			// change URLs to point to your repos, e.g. http://my.org/repo
-			def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-			def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+			def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+			def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 			url = isSnapshotRelease ? snapshotsRepoUrl : releasesRepoUrl
 		}
 	}
@@ -146,5 +146,5 @@ signing {
 }
 
 wrapper {
-	gradleVersion = '7.2'
+	gradleVersion = '7.3.3'
 }
