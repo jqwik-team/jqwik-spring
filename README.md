@@ -20,6 +20,8 @@ This project provides an extension to support testing of Spring and Spring-Boot 
 - [Shortcomings](#shortcomings)
   - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
 - [Release Notes](#release-notes)
+  - [0.9.0](#090)
+  - [0.8.2](#082)
   - [0.8.1](#081)
   - [0.8.0](#080)
 
@@ -35,10 +37,10 @@ and add the following dependency to your `build.gradle` file:
 
 ```
 dependencies {
-    implementation("org.springframework:spring-context:5.3.11")
+    implementation("org.springframework:spring-context:5.3.14")
     ...
-    testImplementation("net.jqwik:jqwik-spring:0.8.2")
-    testImplementation("org.springframework:spring-test:5.3.11")
+    testImplementation("net.jqwik:jqwik-spring:0.9.0")
+    testImplementation("org.springframework:spring-test:5.3.14")
 }
 ```
 
@@ -56,19 +58,19 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-context</artifactId>
-  <version>5.3.11</version>
+  <version>5.3.14</version>
 </dependency>
 ...
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.8.2</version>
+  <version>0.9.0</version>
   <scope>test</scope>
 </dependency>
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-test</artifactId>
-  <version>5.3.11</version>
+  <version>5.3.14</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -79,13 +81,13 @@ You have to provide your own version of Spring or Spring Boot through
 Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 
 - `5.2.15-RELEASE`
-- `5.3.11`
+- `5.3.14`
 
 Please report any compatibility issues you stumble upon.
 
 ### Supported JUnit Platform Versions
 
-You need at least version `1.8.1` of the JUnit platform - otherwise 
+You need at least version `1.8.2` of the JUnit platform - otherwise 
 strange things _could_ happen.
 Keep in mind that if you are using Spring Boot you will have to 
 [explicitly set the JUnit platform version](https://stackoverflow.com/a/54605523/32352).
@@ -216,7 +218,8 @@ This was tested with the following Spring Boot versions:
 - `2.2.13.RELEASE`
 - `2.3.12.RELEASE`
 - `2.4.8`
-- `2.5.4`
+- `2.5.8`
+- `2.6.2`
 
 Please report any issues you have with other versions.
 
@@ -234,6 +237,13 @@ and cannot be fixed by this library.
 
 
 ## Release Notes
+
+### 0.9.0
+
+- Upgrade jqwik 1.6.3
+- Upgrade to JUnitPlatform 5.8.2
+- Tested with Spring 5.3.14
+- Tested with Spring Boot 2.6.2
 
 ### 0.8.2
 
