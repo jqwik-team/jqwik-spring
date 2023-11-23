@@ -17,9 +17,12 @@ This project provides an extension to support testing of Spring and Spring-Boot 
   - [Parameter Resolution of Autowired Beans](#parameter-resolution-of-autowired-beans)
   - [Spring JUnit Jupiter Testing Annotations](#spring-junit-jupiter-testing-annotations)
 - [Spring Boot](#spring-boot)
+- [Supported Spring / Spring Boot Versions](#supported-spring--spring-boot-versions)
+  - [jqwik-spring 0.10.0](#jqwik-spring-0100)
 - [Shortcomings](#shortcomings)
   - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
 - [Release Notes](#release-notes)
+  - [0.10.0](#0100)
   - [0.9.0](#090)
   - [0.8.2](#082)
   - [0.8.1](#081)
@@ -37,10 +40,10 @@ and add the following dependency to your `build.gradle` file:
 
 ```
 dependencies {
-    implementation("org.springframework:spring-context:5.3.14")
+    implementation("org.springframework:spring-context:5.3.31")
     ...
-    testImplementation("net.jqwik:jqwik-spring:0.9.0")
-    testImplementation("org.springframework:spring-test:5.3.14")
+    testImplementation("net.jqwik:jqwik-spring:0.10.0")
+    testImplementation("org.springframework:spring-test:5.3.31")
 }
 ```
 
@@ -58,19 +61,19 @@ and add the following dependency to your `pom.xml` file:
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-context</artifactId>
-  <version>5.3.14</version>
+  <version>5.3.31</version>
 </dependency>
 ...
 <dependency>
   <groupId>net.jqwik</groupId>
   <artifactId>jqwik-spring</artifactId>
-  <version>0.9.0</version>
+  <version>0.10.0</version>
   <scope>test</scope>
 </dependency>
 <dependency>
   <groupId>org.springframework</groupId>
   <artifactId>spring-test</artifactId>
-  <version>5.3.14</version>
+  <version>5.3.31</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -80,11 +83,11 @@ and add the following dependency to your `pom.xml` file:
 You have to provide your own version of Spring or Spring Boot through
 Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 
-See [Compatibility](#compatibility) for more details.
+See [supported versions](#supported-spring--spring-boot-versions) for more details.
 
 ### Supported JUnit Platform Versions
 
-You need at least version `1.8.2` of the JUnit platform - otherwise 
+You need at least version `1.10.1` of the JUnit platform - otherwise 
 strange things _could_ happen.
 Keep in mind that if you are using Spring Boot you will have to 
 [explicitly set the JUnit platform version](https://stackoverflow.com/a/54605523/32352).
@@ -210,11 +213,11 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
 By using `@JqwikSpringSupport` as described above most - if not all - Spring Boot
 testing features, e.g. [test auto-configuration annotations](https://docs.spring.io/spring-boot/docs/current/reference/html/test-auto-configuration.html#test-auto-configuration) should work.
 
-## Compatibility
+## Supported Spring / Spring Boot Versions
 
 ### jqwik-spring 0.10.0
 
-- Java 8 - 17
+Supports Java 8 and above.
 
 #### Spring Framework
 
