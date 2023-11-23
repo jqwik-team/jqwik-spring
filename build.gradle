@@ -21,8 +21,8 @@ ext {
 //	springBootVersion = '2.4.8'
 //	springBootVersion = '2.5.8'
 	springBootVersion = '2.6.2'
-	assertJVersion = '3.22.0'
-	mockitoVersion = '4.2.0'
+	assertJVersion = '3.24.2'
+	mockitoVersion = '4.11.0'
 	jqwikVersion = '1.8.2'
 	jqwikSpringVersion = '0.10.0-SNAPSHOT'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
