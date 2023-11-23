@@ -12,6 +12,7 @@ ext {
 	moduleName = 'net.jqwik.spring'
 	junitPlatformVersion = '1.10.1'
 	opentest4jVersion = '1.2.0'
+	junitPlatformVersion = '1.10.1'
 	junitJupiterVersion = '5.10.1'
 //	springVersion = '5.2.15.RELEASE'
 	springVersion = '5.3.14'
@@ -86,6 +87,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
 
 	testImplementation("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
 }
 
 publishing {
