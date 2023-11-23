@@ -121,4 +121,10 @@ class JupiterExtensionContextAdapter implements ExtensionContext {
 	public ExecutionMode getExecutionMode() {
 		return ExecutionMode.SAME_THREAD;
 	}
+
+	@Override
+	public ExecutableInvoker getExecutableInvoker() {
+		// TODO: Is it being used for Spring extension?
+		return null;
+	}
 }
