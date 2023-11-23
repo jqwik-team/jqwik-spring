@@ -80,10 +80,7 @@ and add the following dependency to your `pom.xml` file:
 You have to provide your own version of Spring or Spring Boot through
 Gradle or Maven. The _jqwik-spring_ library has been tested with versions:
 
-- `5.2.15-RELEASE`
-- `5.3.14`
-
-Please report any compatibility issues you stumble upon.
+See [Compatibility](#compatibility) for more details.
 
 ### Supported JUnit Platform Versions
 
@@ -213,15 +210,22 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
 By using `@JqwikSpringSupport` as described above most - if not all - Spring Boot
 testing features, e.g. [test auto-configuration annotations](https://docs.spring.io/spring-boot/docs/current/reference/html/test-auto-configuration.html#test-auto-configuration) should work.
 
-This was tested with the following Spring Boot versions:
+## Compatibility
 
-- `2.2.13.RELEASE`
-- `2.3.12.RELEASE`
-- `2.4.8`
-- `2.5.8`
-- `2.6.2`
+### jqwik-spring 0.10.0
 
-Please report any issues you have with other versions.
+- Java 8 - 17
+
+#### Spring Framework
+
+- `5.2.15-RELEASE`
+- `5.3.31`
+
+#### Spring Boot
+
+- `2.6.15`
+- `2.7.17`
+
 
 ## Shortcomings
 
@@ -237,6 +241,15 @@ and cannot be fixed by this library.
 
 
 ## Release Notes
+
+### 0.10.0
+
+__Last version supporting Java 8__
+
+- Upgrade to jqwik 1.8.2
+- Upgrade to JUnitPlatform 5.10.1
+- Tested with Spring 5.3.31
+- Tested with Spring Boot 2.6.15, 2.7.17
 
 ### 0.9.0
 
