@@ -15,17 +15,17 @@ ext {
 	junitPlatformVersion = '1.10.1'
 	junitJupiterVersion = '5.10.1'
 //	springVersion = '5.2.15.RELEASE'
-	springVersion = '5.3.31'
+//	springVersion = '5.3.31'
 //	springVersion = '6.0.14'
-//	springVersion = '6.1.0'
+	springVersion = '6.1.0'
 //	springBootVersion = '2.6.15'
-	springBootVersion = '2.7.17'
+//	springBootVersion = '2.7.17'
 //	springBootVersion = '3.0.12'
-//	springBootVersion = '3.1.5'
+	springBootVersion = '3.1.5'
 	assertJVersion = '3.24.2'
 	mockitoVersion = '4.11.0'
 	jqwikVersion = '1.8.2'
-	jqwikSpringVersion = '0.10.0'
+	jqwikSpringVersion = '0.11.0'
 	isSnapshotRelease = isSnapshotRelease(jqwikSpringVersion)
 }
 
@@ -48,8 +48,8 @@ jar {
 java {
 	withJavadocJar()
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 compileTestJava {

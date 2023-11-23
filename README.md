@@ -18,10 +18,12 @@ This project provides an extension to support testing of Spring and Spring-Boot 
   - [Spring JUnit Jupiter Testing Annotations](#spring-junit-jupiter-testing-annotations)
 - [Spring Boot](#spring-boot)
 - [Supported Spring / Spring Boot Versions](#supported-spring--spring-boot-versions)
+  - [jqwik-spring 0.11.0](#jqwik-spring-0110)
   - [jqwik-spring 0.10.0](#jqwik-spring-0100)
 - [Shortcomings](#shortcomings)
   - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
 - [Release Notes](#release-notes)
+  - [0.11.0](#0110)
   - [0.10.0](#0100)
   - [0.9.0](#090)
   - [0.8.2](#082)
@@ -215,6 +217,21 @@ testing features, e.g. [test auto-configuration annotations](https://docs.spring
 
 ## Supported Spring / Spring Boot Versions
 
+### jqwik-spring 0.11.0
+
+Supports Java 17 and above.
+
+#### Spring Framework
+
+- `5.2.15-RELEASE`
+- `5.3.31`
+
+#### Spring Boot
+
+- `2.6.15`
+- `2.7.17`
+
+
 ### jqwik-spring 0.10.0
 
 Supports Java 8 and above.
@@ -245,9 +262,19 @@ and cannot be fixed by this library.
 
 ## Release Notes
 
+### 0.11.0
+
+__First version supporting Spring 3.x.__
+
+__Requires Java 17 or above.__
+
+- Tested with Spring 5.3.31, 6.0.14, 6.1.0
+- Tested with Spring Boot 2.6.15, 2.7.17, 3.0.12, 3.1.5
+
+
 ### 0.10.0
 
-__Last version supporting Java 8__
+__Last version supporting Java 8 - 16.__
 
 - Upgrade to jqwik 1.8.2
 - Upgrade to JUnitPlatform 5.10.1
