@@ -269,7 +269,7 @@ __First version supporting Spring 3.x.__
 __Requires Java 17 or above.__
 
 - Tested with Spring 5.3.31, 6.0.14, 6.1.0
-- Tested with Spring Boot 2.6.15, 2.7.17, 3.0.12, 3.1.5
+- Tested with Spring Boot 2.6.15, 2.7.17, 3.0.12, 3.1.5, 3.2.0
 
 
 ### 0.10.0
