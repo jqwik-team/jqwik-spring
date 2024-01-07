@@ -13,6 +13,13 @@ public class JqwikSpringLifecycleSupport {
 
 	private JqwikSpringLifecycleSupport() {}
 
+	/**
+	 * Returns the {@link ApplicationContext} for the given {@link LifecycleContext}.
+	 * If there is none, an empty {@link Optional} is returned.
+	 *
+	 * @param context A jqwik lifecycle context object
+	 * @return
+	 */
 	public static Optional<ApplicationContext> applicationContext(LifecycleContext context) {
 		if (context instanceof MethodLifecycleContext methodContext) {
 			TestContextManager testContextManager =
