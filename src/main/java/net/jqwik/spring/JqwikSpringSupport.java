@@ -2,8 +2,9 @@ package net.jqwik.spring;
 
 import java.lang.annotation.*;
 
-import net.jqwik.api.lifecycle.*;
 import org.apiguardian.api.*;
+
+import net.jqwik.api.lifecycle.*;
 
 import static org.apiguardian.api.API.Status.*;
 

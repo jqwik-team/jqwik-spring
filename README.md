@@ -14,6 +14,7 @@ This project provides an extension to support testing of Spring and Spring-Boot 
   - [Supported JUnit Platform Versions](#supported-junit-platform-versions)
 - [Standard Usage](#standard-usage)
   - [Lifecycle](#lifecycle)
+  - [Support for Jqwik Lifecycle Hooks](#support-for-jqwik-lifecycle-hooks)
   - [Parameter Resolution of Autowired Beans](#parameter-resolution-of-autowired-beans)
   - [Spring JUnit Jupiter Testing Annotations](#spring-junit-jupiter-testing-annotations)
 - [Spring Boot](#spring-boot)
@@ -23,6 +24,7 @@ This project provides an extension to support testing of Spring and Spring-Boot 
 - [Shortcomings](#shortcomings)
   - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
 - [Release Notes](#release-notes)
+  - [0.12.0-SNAPSHOT](#0120-snapshot)
   - [0.11.0](#0110)
   - [0.10.0](#0100)
   - [0.9.0](#090)
@@ -163,6 +165,14 @@ class MySpringProperties {
 }
 ```
 
+### Support for Jqwik Lifecycle Hooks
+
+The class `JqwikSpringLifecycleSupport` provides methods that can be used from
+jqwik lifecycle hooks:
+
+- `getApplicationContext(LifecycleContext)` returns an optional of the current Spring application context.
+
+
 ### Parameter Resolution of Autowired Beans 
 
 Autowired beans will be injected as parameters in example and property methods,
@@ -209,6 +219,7 @@ Jupiter support works. Therefore, some of that stuff also works, but a few thing
 - [`@DisabledIf`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-junit-jupiter-disabledif)
 
 - [`@NestedTestConfiguration`](https://docs.spring.io/spring-framework/docs/current/reference/html/testing.html#integration-testing-annotations-nestedtestconfiguration)
+
 
 ## Spring Boot
 
@@ -261,6 +272,11 @@ and cannot be fixed by this library.
 
 
 ## Release Notes
+
+### 0.12.0-SNAPSHOT
+
+- Added `JqwikSpringLifecycleSupport.getApplicationContext()`
+
 
 ### 0.11.0
 
