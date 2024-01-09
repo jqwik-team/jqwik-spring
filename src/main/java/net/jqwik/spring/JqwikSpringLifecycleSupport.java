@@ -8,6 +8,11 @@ import org.springframework.test.context.*;
 
 import net.jqwik.api.lifecycle.*;
 
+/**
+ * This class provides convenience methods for Jqwik Lifecycle Hooks
+ *
+ * @see LifecycleHook
+ */
 @API(status = API.Status.EXPERIMENTAL, since = "0.12")
 public class JqwikSpringLifecycleSupport {
 
@@ -18,17 +23,17 @@ public class JqwikSpringLifecycleSupport {
 	 * If there is none, an empty {@link Optional} is returned.
 	 *
 	 * @param context A jqwik lifecycle context object
-	 * @return
+	 * @return The optional {@link ApplicationContext} for the given {@link LifecycleContext}
 	 */
 	public static Optional<ApplicationContext> applicationContext(LifecycleContext context) {
-		if (context instanceof MethodLifecycleContext methodContext) {
-			TestContextManager testContextManager =
-				JqwikSpringExtension.getTestContextManager(methodContext.containerClass());
+		return context.optionalContainerClass().flatMap(containerClass -> {
+			TestContextManager testContextManager = JqwikSpringExtension.getTestContextManager(containerClass);
 			if (testContextManager != null) {
 				return Optional.of(testContextManager.getTestContext().getApplicationContext());
+			} else {
+				return Optional.empty();
 			}
-		}
-		return Optional.empty();
+		});
 	}
 
 }
