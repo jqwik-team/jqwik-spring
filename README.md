@@ -24,7 +24,7 @@ This project provides an extension to support testing of Spring and Spring-Boot 
 - [Shortcomings](#shortcomings)
   - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
 - [Release Notes](#release-notes)
-  - [0.12.0-SNAPSHOT](#0120-snapshot)
+  - [0.12.0](#0120)
   - [0.11.0](#0110)
   - [0.10.0](#0100)
   - [0.9.0](#090)
