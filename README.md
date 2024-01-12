@@ -273,7 +273,7 @@ and cannot be fixed by this library.
 
 ## Release Notes
 
-### 0.12.0-SNAPSHOT
+### 0.12.0
 
 - Added `JqwikSpringLifecycleSupport.getApplicationContext()`
 
