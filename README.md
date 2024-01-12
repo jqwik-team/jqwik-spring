@@ -19,7 +19,7 @@ This project provides an extension to support testing of Spring and Spring-Boot 
   - [Spring JUnit Jupiter Testing Annotations](#spring-junit-jupiter-testing-annotations)
 - [Spring Boot](#spring-boot)
 - [Supported Spring / Spring Boot Versions](#supported-spring--spring-boot-versions)
-  - [jqwik-spring 0.11.0](#jqwik-spring-0110)
+  - [jqwik-spring 0.12.0](#jqwik-spring-0120)
   - [jqwik-spring 0.10.0](#jqwik-spring-0100)
 - [Shortcomings](#shortcomings)
   - [Nested/Grouped Tests in Old Spring (Boot) Versions](#nestedgrouped-tests-in-old-spring-boot-versions)
@@ -228,7 +228,7 @@ testing features, e.g. [test auto-configuration annotations](https://docs.spring
 
 ## Supported Spring / Spring Boot Versions
 
-### jqwik-spring 0.11.0
+### jqwik-spring 0.12.0
 
 Supports Java 17 and above.
 
@@ -236,11 +236,13 @@ Supports Java 17 and above.
 
 - `5.2.15-RELEASE`
 - `5.3.31`
+- `6.1.0`
 
 #### Spring Boot
 
 - `2.6.15`
 - `2.7.17`
+- `3.2.0`
 
 
 ### jqwik-spring 0.10.0
